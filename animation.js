@@ -388,6 +388,11 @@ var Spritesheet = (function () {
         //Set the default render mode
         setRenderModeDefault: function () {
             rendermode = rendermode_default;
+        },
+        //Set the size of the buffer canvas
+        setBufferSize: function (w,h) {
+            buffercanvas.width = w;
+            buffercanvas.height = h;
         }
     };
 
