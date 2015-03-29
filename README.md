@@ -24,4 +24,4 @@ Coming soon!
 ##FAQ
 Coming soon!
 ##Examples
-Coming soon!
+Check out examples/example1.html to see a quick example that shows various features, and you should also check examples/spritesheets.xml to see the spritesheet structure. Thanks to [Silvia Barbero](http:\\www.silvishinystar.deviantart.com) for allowing me to use her dog sprite!

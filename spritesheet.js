@@ -396,6 +396,8 @@ var Spritesheet = (function () {
         }
     };
 
+    //Those are auxiliar functions
+
     function findwhere(array, property, value) {
         for (var i = 0; i < array.length; i++) {
             if (array[i][property] == value) {
@@ -450,6 +452,14 @@ var Spritesheet = (function () {
                 log("browser doesn't support AJAX.");
                 return null;
             }
+        }
+    }
+
+    function superModulo(a, b) {
+        if (a >= 0) {
+            return a % b;
+        } else {
+            return b + a % b;
         }
     }
 

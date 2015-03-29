@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Spritesheet.js example</title>
+    <script src="../spritesheet.js"></script>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    <div id="log"></div>
+    <script>
+        var canvasAnimation = new Spritesheet();
+        canvasAnimation.setUp(document.getElementById("canvas"), 30);
+        canvasAnimation.setBufferSize(800, 600);
+        //This function will be called when the xml is loaded
+        var callback_load = function () {
+            document.getElementById("log").innerHTML += "XML file loaded!  ";
+            //The beach is a good example on how can you reuse the frames
+            //And set their x and y coordinates using matematical functions
+            var beach_id = canvasAnimation.addObject("Beach", "Beach", 0, 0, -5, false, false);
+            document.getElementById("log").innerHTML += "Beach added!  ";
+            //The dog must have a zindex greater than the one specified for the beach to be visible (0 > -5)
+            var dog_id = canvasAnimation.addObject("Paradog", "Idle", 800, 250, 0, false, false);
+            document.getElementById("log").innerHTML += "Dog added!  ";
+            var dog_state = 0;
+            //Move the camera to show the dog
+            canvasAnimation.setCamera(-650, 0);
+            document.getElementById("log").innerHTML += "Camera set!  ";
+            var dog_x = 800;
+            var dog_direction=1;
+            window.setInterval(function () {
+                switch (dog_state) {
+                    //Idle
+                    case 0:
+                        canvasAnimation.setState(dog_id, "Idle");
+                        if (Math.random() < 0.05) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                        //Run
+                    case 1:
+                        if (dog_x < 200 || dog_x > 1250) {
+                            dog_direction *= -1;
+                        }
+                        switch (dog_direction) {
+                            case 1:
+                                //When the dog moves we also move the camera to keep it centered
+                                canvasAnimation.setState(dog_id, "RunR");
+                                canvasAnimation.moveX(-20);
+                                dog_x += 20;
+                                break;
+                            case -1:
+                                //Check out the spritesheet to see how easy is to flip the dog!
+                                canvasAnimation.setState(dog_id, "RunL");
+                                canvasAnimation.moveX(20);
+                                dog_x -= 20;
+                                break;
+                        }
+                        canvasAnimation.setX(dog_id, dog_x);
+                        if (Math.random() < 0.03) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                        //Bark
+                    case 2:
+                        //Changing the state of an object is as easy as calling this function
+                        canvasAnimation.setState(dog_id, "Bark");
+                        if (Math.random() < 0.09) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                }
+            }, 100);
+        };
+
+        //For security reasons, IE (and maybe other browsers) won't let you load local files by default
+        //IF (YOU ARE DEVELOPING AN APP OR WEB APP){ 
+        //It is recommended to load the XML and PNG from the server 
+        //If you need to make run it offline, for testing purposes Firefox seems to work fine
+        //} ELSE IF (YOU ARE DEVELOPING AN APP WITH APACHE CORDOVA){
+        //When encapsulated inside an Apache Cordova app, you will be able to load local files without issues
+        //}
+        canvasAnimation.asyncload("spritesheets.xml", callback_load);
+       
+    </script>
+</body>
+</html>
