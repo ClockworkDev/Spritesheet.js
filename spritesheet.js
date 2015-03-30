@@ -127,8 +127,8 @@ var Spritesheet = (function () {
                     var xposition = (+layer.x(object.t)) + (+object.x);
                     var yposition = (+layer.y(object.t)) + (+object.y);
                 } else {
-                    var xposition = (+layer.x(object.t)) + (+object.x) + camera.x;
-                    var yposition = (+layer.y(object.t)) + (+object.y) + camera.y;
+                    var xposition = (+layer.x(object.t)) + (+object.x) - camera.x;
+                    var yposition = (+layer.y(object.t)) + (+object.y) - camera.y;
                 }
 
                 //Maybe the image must be flipped in some axis

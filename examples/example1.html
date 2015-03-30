@@ -25,7 +25,7 @@
             document.getElementById("log").innerHTML += "Dog added!  ";
             var dog_state = 0;
             //Move the camera to show the dog
-            canvasAnimation.setCamera(-650, 0);
+            canvasAnimation.setCamera(650, 0);
             document.getElementById("log").innerHTML += "Camera set!  ";
             var dog_x = 800;
             var dog_direction=1;
@@ -47,13 +47,13 @@
                             case 1:
                                 //When the dog moves we also move the camera to keep it centered
                                 canvasAnimation.setState(dog_id, "RunR");
-                                canvasAnimation.moveX(-20);
+                                canvasAnimation.moveX(20);
                                 dog_x += 20;
                                 break;
                             case -1:
                                 //Check out the spritesheet to see how easy is to flip the dog!
                                 canvasAnimation.setState(dog_id, "RunL");
-                                canvasAnimation.moveX(20);
+                                canvasAnimation.moveX(-20);
                                 dog_x -= 20;
                                 break;
                         }
