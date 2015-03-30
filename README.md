@@ -18,7 +18,32 @@ There are four levels to consider when designing a spritesheet:
 
 For example, when animating a person walking, there could be two states: "Idle" and "Walking". Each state could be formed by several layers: "Body", "Arms", "Legs", and some layers could be reused in both states. Each layer could have several frames with the sucessive steps of the animation. Finally, the spritesheet should contain all of them, plus a reference to "someone_walking.png". 
 ##Writing the spritesheet with XML
-Coming soon!
+A XML file can describe one or multiple spritesheets and has the following structure:
+```
+<spritesheets>
+ <spritesheet name="Something" src="path/something.png">
+    <states>
+      <state name="State1">
+        <layer name="Layer1"></layer>
+        ...
+      </state>
+      ...
+    </states>
+    <layers>
+       <layer name="Layer1" x="0" y="0">
+        <frame name="Frame1"></frame>
+        ...
+      </layer>
+      ...
+    </layers>
+    <frames>
+      <frame name="Frame1" x="0" y="0" w="100" h="50" t="30"></frame>
+      ...
+    </frames>
+  </spritesheet>
+  ...
+</spritesheets>
+```
 ##Using the library
 Coming soon!
 ##FAQ
