@@ -61,11 +61,12 @@ To start using the library follow this steps:
   7. Set the camera position if needed.
   `canvasAnimation.setCamera(-650, 0);`
   8. You can modify the objects using their id, like in these examples.
-  ```
+```
    canvasAnimation.setState(object_id, "SomeState");
    canvasAnimation.setX(object_id, 50);
    canvasAnimation.moveX(20);
 ```
+
 ##FAQ
 Coming soon!
 ##Examples
