@@ -47,13 +47,13 @@
                             case 1:
                                 //When the dog moves we also move the camera to keep it centered
                                 canvasAnimation.setState(dog_id, "RunR");
-                                canvasAnimation.moveX(20);
+                                canvasAnimation.moveCameraX(20);
                                 dog_x += 20;
                                 break;
                             case -1:
                                 //Check out the spritesheet to see how easy is to flip the dog!
                                 canvasAnimation.setState(dog_id, "RunL");
-                                canvasAnimation.moveX(-20);
+                                canvasAnimation.moveCameraX(-20);
                                 dog_x -= 20;
                                 break;
                         }
@@ -81,7 +81,7 @@
         //} ELSE IF (YOU ARE DEVELOPING AN APP WITH APACHE CORDOVA){
         //When encapsulated inside an Apache Cordova app, you will be able to load local files without issues
         //}
-        canvasAnimation.asyncload("spritesheets.xml", callback_load);
+        canvasAnimation.asyncLoad("spritesheets.xml", callback_load);
        
     </script>
 </body>

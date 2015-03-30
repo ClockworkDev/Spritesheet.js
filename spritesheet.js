@@ -291,9 +291,13 @@ var Spritesheet = (function () {
                 canvas.height = window.innerHeight;
             };
         },
-        //This function stops the 'time'... but it does no stop drawing
-        stop: function () {
+        //This function pauses the 'time'... but it does no stop drawing
+        pauseAll: function () {
             window.clearInterval(intervalholder);
+        },
+        //This function continues playing thr animation after calling pauseAll()
+        restart: function () {
+            intervalholder = window.setInterval(renderprocess, Math.round(1000 / nfps));
         },
         //Set the camera position
         setCamera: function (x, y) {
@@ -301,15 +305,15 @@ var Spritesheet = (function () {
             camera.y = y;
         },
         //Move the camera in the x axis
-        moveX: function (x) {
+        moveCameraX: function (x) {
             camera.x += x;
         },
         //Move the camera in the y axis
-        moveY: function (y) {
+        moveCameraY: function (y) {
             camera.y += y;
         },
         //Load the XML with the data (async)
-        asyncload: function (url, funcion) {
+        asyncLoad: function (url, funcion) {
             loadXMLFile(url, realparse, funcion);
         },
         //Add an object to the engine
