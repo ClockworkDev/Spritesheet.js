@@ -28,7 +28,7 @@
             canvasAnimation.setCamera(650, 0);
             document.getElementById("log").innerHTML += "Camera set!  ";
             var dog_x = 800;
-            var dog_direction=1;
+            var dog_direction = 1;
             window.setInterval(function () {
                 switch (dog_state) {
                     //Idle
@@ -73,16 +73,48 @@
                 }
             }, 100);
         };
+        var customRenderMode = function (contextinput, contextoutput) {
+            contextoutput.clearRect(0, 0, contextoutput.canvas.width, contextoutput.canvas.height);
+            var imageData = contextinput.getImageData(0, 0, contextinput.canvas.width, contextinput.canvas.height);
+            var pixels = imageData.data;
+
+            var imageDataOut = contextinput.getImageData(0, 0, contextoutput.canvas.width, contextoutput.canvas.height);
+            var pixelsOut = imageDataOut.data;
+            // Once we get the image data, we can play with it
+            //Calculations are done in the CPU, which is not optimal, but runs without issues even with Intel Integrated Graphics
+            for (var i = 0, il = pixels.length; i < il; i += 4) {
+                //The anaglyhp algrithm:
+                //Get each pixel intenisty, and color red and cyan with a small offset.
+                var grey = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+                if ((i / 4) % contextinput.canvas.width < contextinput.canvas.width - 5) {
+                    pixelsOut[i + 1 + 20] = grey;
+                    pixelsOut[i + 2 + 20] = grey;
+                } else {
+                    pixelsOut[i + 1 + 20] = 0;
+                    pixelsOut[i + 2 + 20] = 0;
+                }
+                if ((i / 4) % contextinput.canvas.width > 5) {
+                    pixelsOut[i - 20] = grey;
+                } else {
+                    pixelsOut[i - 20] = 0;
+                }
+            }
+
+            contextoutput.putImageData(imageDataOut, 0, 0);
+        };
+
+        canvasAnimation.setRenderMode(customRenderMode);
 
         //For security reasons, IE (and maybe other browsers) won't let you load local files by default
-        //IF (YOU ARE DEVELOPING AN APP OR WEB APP){ 
-        //It is recommended to load the XML and PNG from the server 
+        //IF (YOU ARE DEVELOPING AN APP OR WEB APP){
+        //It is recommended to load the XML and PNG from the server
         //If you need to make run it offline, for testing purposes Firefox seems to work fine
         //} ELSE IF (YOU ARE DEVELOPING AN APP WITH APACHE CORDOVA){
         //When encapsulated inside an Apache Cordova app, you will be able to load local files without issues
         //}
+
         canvasAnimation.asyncLoad("spritesheets.xml", callback_load);
-       
+
     </script>
 </body>
 </html>
