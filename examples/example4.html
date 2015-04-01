@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Spritesheet.js example</title>
+    <script src="../spritesheet.js"></script>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    <div id="log"></div>
+    <script>
+        var canvasAnimation = new Spritesheet();
+        canvasAnimation.setUp(document.getElementById("canvas"), 30);
+        canvasAnimation.setBufferSize(800, 600);
+
+
+        var callback_load2 = function () {
+            document.getElementById("log").innerHTML += "XML2 loaded!  ";
+            var beach_id = canvasAnimation.addObject("Beach", "Beach", 0, 0, -5, false, false);
+            document.getElementById("log").innerHTML += "Beach added!  ";
+            var dog_id = canvasAnimation.addObject("Paradog", "Idle", 800, 250, 0, false, false);
+            //We instantiate the textbox as usual
+            //Setting the static property to true so it is not affected by camera movements
+            var text_id = canvasAnimation.addObject("Textbox", "Text", 20, 20, 5,true, false);
+
+            document.getElementById("log").innerHTML += "Dog added!  ";
+            var dog_state = 0;
+            canvasAnimation.setCamera(650, 0);
+            document.getElementById("log").innerHTML += "Camera set!  ";
+            var dog_x = 800;
+            var dog_direction=1;
+            window.setInterval(function () {
+                switch (dog_state) {
+                    //Idle
+                    case 0:
+                        //Set the variable text in the TextBox
+                        canvasAnimation.setParameter(text_id, "text", "Idle");
+                        canvasAnimation.setParameter(text_id, "color", "#FFFF00");
+                        canvasAnimation.setState(dog_id, "Idle");
+                        if (Math.random() < 0.05) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                        //Run
+                    case 1:
+                        canvasAnimation.setParameter(text_id, "text", "Running");
+                        canvasAnimation.setParameter(text_id, "color", "#00FF00");
+                        if (dog_x < 200 || dog_x > 1250) {
+                            dog_direction *= -1;
+                        }
+                        switch (dog_direction) {
+                            case 1:
+                                canvasAnimation.setState(dog_id, "RunR");
+                                canvasAnimation.moveCameraX(20);
+                                dog_x += 20;
+                                break;
+                            case -1:
+                                canvasAnimation.setState(dog_id, "RunL");
+                                canvasAnimation.moveCameraX(-20);
+                                dog_x -= 20;
+                                break;
+                        }
+                        canvasAnimation.setX(dog_id, dog_x);
+                        if (Math.random() < 0.03) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                        //Bark
+                    case 2:
+                        canvasAnimation.setParameter(text_id, "text", "Barking");
+                        canvasAnimation.setParameter(text_id, "color", "#FF0000");
+                        canvasAnimation.setState(dog_id, "Bark");
+                        if (Math.random() < 0.09) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                }
+            }, 100);
+        };
+        var callback_load = function () {
+            document.getElementById("log").innerHTML += "XML1 loaded!  ";
+            canvasAnimation.asyncLoad("spritesheet_textbox.xml", callback_load2);
+        };
+        //For security reasons, IE (and maybe other browsers) won't let you load local files by default
+        //IF (YOU ARE DEVELOPING AN APP OR WEB APP){ 
+        //It is recommended to load the XML and PNG from the server 
+        //If you need to make run it offline, for testing purposes Firefox seems to work fine
+        //} ELSE IF (YOU ARE DEVELOPING AN APP WITH APACHE CORDOVA){
+        //When encapsulated inside an Apache Cordova app, you will be able to load local files without issues
+        //}
+        canvasAnimation.asyncLoad("spritesheets.xml", callback_load);
+       
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Spritesheet.js example</title>
+    <script src="../spritesheet.js"></script>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    <div id="log"></div>
+    <script>
+        var canvasAnimation = new Spritesheet();
+        canvasAnimation.setUp(document.getElementById("canvas"), 30);
+        canvasAnimation.setBufferSize(800, 600);
+
+        var callback_load = function () {
+            var ids = [];
+            ids[2] = canvasAnimation.addObject("Card", "Blue", 50, 100, 1, false, false);
+            ids[1] = canvasAnimation.addObject("Card", "Green", 70, 150, 2, false, false);
+            ids[0] = canvasAnimation.addObject("Card", "Red", 90, 200, 3, false, false);
+            var states = [3,2,1];
+            moving = false;
+            var timer = 0;
+
+            //The cards will move when the user presses any key
+            window.onkeydown = function () {
+                moving=true;
+            }
+
+            window.setInterval(function () {
+                if (moving == true) {
+                    //Move the cards
+                    for (var i = 0; i < 3; i++) {
+                        switch (states[i]) {
+                            case 3:
+                                canvasAnimation.setX(ids[i], 90 - 40 * timer / 100 + 200*Math.sin(Math.PI*timer/100));
+                                canvasAnimation.setY(ids[i], 200 - 100 * timer / 100);
+                                break;
+                            case 2:
+                                canvasAnimation.setX(ids[i],70+20*timer/100);
+                                canvasAnimation.setY(ids[i],150+50*timer/100);
+                                break;
+                            case 1:
+                                canvasAnimation.setX(ids[i],50+20*timer/100);
+                                canvasAnimation.setY(ids[i],100+50*timer/100);
+                                break;
+                        }
+                    }
+                    timer++;
+                    //While the top card is moving, we change the z index
+                    if (timer == 50) {
+                        for (var i = 0; i < 3; i++) {
+                            canvasAnimation.setZindex(ids[i], (1 + (states[i]) % 3));
+                        }
+                    }
+                    //End the animation
+                    //Save the new states
+                    if (timer == 100) {
+                        for (var i = 0; i < 3; i++) {
+                            states[i] = 1 + (states[i]) % 3;
+                        }
+                        console.log(states);
+                        moving = false;
+                        timer = 0;
+                    }
+                }
+            }, 30);
+        };
+
+
+        canvasAnimation.asyncLoad("spritesheets_cards.xml", callback_load);
+
+    </script>
+</body>
+</html>

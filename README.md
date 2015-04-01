@@ -72,6 +72,12 @@ Coming soon!
 ##Examples
 Check out [examples/example1.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example1.html) to see a quick example that shows various features, and you should also read [examples/spritesheets.xml](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/spritesheets.xml) to see the spritesheet structure.
 
+Check out [examples/example2.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example2.html) to see how to use custom render modes.
+
+Check out [examples/example3.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example3.html) to see how to use the Zindex to make '3d' animations.
+
+Check out [examples/example4.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example4.html) to see when to use static objects and how to use custom 'code frames'.
+
 Thanks to [Silvia Barbero](http://silvishinystar.deviantart.com/) for allowing me to use her dog sprite!
 
 If you have used Spritesheet.js in a project, or you have just made a nice demo, you can ask to be featured in this section!
