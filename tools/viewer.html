@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Spritesheet.js example</title>
+    <script src="../spritesheet.js"></script>
+</head>
+<body>
+    Spritesheet path:<input type="text" id="xmlpath" value="spritesheet_viewertest.xml"/>
+    <button id="b_load">Load</button>
+    Spritesheet:<select id="spritesheet" onchange="updateState();"></select>
+    State:<select id="state" onchange="updateAnim();"></select>
+
+    <canvas id="canvas" width="800" height="400"></canvas>
+
+    <script>
+        var canvasAnimation = new Spritesheet();
+        canvasAnimation.setUp(document.getElementById("canvas"), 30);
+        canvasAnimation.setBufferSize(800, 400);
+  
+        function getXMLHttpRequest() {
+            if (window.XMLHttpRequest && !(window.ActiveXObject && isFileProtocol)) {
+                return new (XMLHttpRequest);
+            } else {
+                try {
+                    return new (ActiveXObject)("MSXML2.XMLHTTP.3.0");
+                } catch (e) {
+                    log("browser doesn't support AJAX.");
+                    return null;
+                }
+            }
+        }
+
+        document.getElementById("b_load").onclick = function () {
+            var url = document.getElementById("xmlpath").value;
+
+            canvasAnimation.asyncLoad(url, function () { });
+            var xmlhttp = getXMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    parseStates(xmlhttp.responseXML);
+                }
+            }
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+        }
+
+        var spritesheets;
+
+        function parseStates(xmlDoc) {
+            spritesheets = [];
+
+            for (var k = 0; k < xmlDoc.getElementsByTagName("spritesheet").length; k++) {
+
+                var ss = { name: xmlDoc.getElementsByTagName("spritesheet")[k].getAttributeNode("name").value, states: [] };
+                var statesxml = xmlDoc.getElementsByTagName("spritesheet")[k].getElementsByTagName("states")[0];
+                for (var i = 0; i < statesxml.getElementsByTagName("state").length; i++) {
+                    ss.states.push(statesxml.getElementsByTagName("state")[i].getAttributeNode("name").value);
+                }
+                spritesheets.push(ss);
+            }
+
+            document.getElementById("spritesheet").innerHTML = "";
+            for (var i = 0; i < spritesheets.length; i++) {
+                document.getElementById("spritesheet").innerHTML += "<option>" + spritesheets[i].name + "</option>";
+            }
+            updateState();
+            updateAnim();
+        }
+
+        function updateState() {
+            var ss = spritesheets[document.getElementById("spritesheet").selectedIndex].states;
+
+            document.getElementById("state").innerHTML = "";
+            for (var i = 0; i < ss.length; i++) {
+                document.getElementById("state").innerHTML += "<option>" + ss[i] + "</option>";
+            }
+        }
+
+        function updateAnim() {
+            canvasAnimation.clear()
+            canvasAnimation.addObject(spritesheets[document.getElementById("spritesheet").selectedIndex].name, spritesheets[document.getElementById("spritesheet").selectedIndex].states[document.getElementById("state").selectedIndex], 0, 0, 0, false, false);
+        }
+    </script>
+</body>
+</html>

@@ -44,6 +44,8 @@ A XML file can describe one or multiple spritesheets and has the following struc
   ...
 </spritesheets>
 ```
+
+You can test the animations in the [viewer](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html).
 ##Using the library
 To start using the library follow this steps:
   1. Include the .js file in your .html file.
@@ -74,7 +76,7 @@ To start using the library follow this steps:
 
   - *Where should I start?*
   
-  Start running and reading the examples to see how to use the library, and you should read the xml files with the spritesheets.
+  Start running and reading the examples to see how to use the library, and you should read the xml files with the spritesheets. If you create an xml spritesheet, you can test it in the [viewer](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html) without having to write any code.
 
   - *The examples don't work, I only see a blank screen!*
 
@@ -84,7 +86,7 @@ To start using the library follow this steps:
   
   First of all, you don't have to write code to handle animations, it is as easy as using the library. But there are also other benefits: the modular nature of the spritesheets allow to reuse animations between projects, or redraw and reanimate everything, without writing a single line of code. 
 
-  If you work in a team, the animators probably will not be involved in the code: with this library you can let them write the spritesheets, test them and work independiently without having to be constantly asking for modifications in your code base.
+  If you work in a team, the animators probably will not be involved in the code: with this library you can let them write the spritesheets, test them and work independiently using the [viewer](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html) without having to be constantly asking for modifications in your code base.
 
 ##Examples
 Check out [examples/example1.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example1.html) to see a quick example that shows various features, and you should also read [examples/spritesheets.xml](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/spritesheets.xml) to see the spritesheet structure.
@@ -106,12 +108,13 @@ These features will be added to the library:
   Frames will be able to play sound files, allowing to integrate animations and sound effects
   - **Several optimizations**:
   For example, the library doesn't take into account which objects are actually in the screen area, so it renders everything. That should be fixed.
-  - **Spritesheet viewer**:
-  A small utitlity to view the animations, to allow to write and test spritesheets as easy and fast as possible.
+
 
 These feaures are being considered:
   - **Cutscenes**:
   Preset animations that specify the movement of instanciated objects, it could be used to create movies, cutscenes or any kind of non-interactive animation.
+  - **Spritesheet creator**:
+  A small utitlity to create the animations, drawing squares to create the frames and grouping them in layers and states.
 
 If you have ideas for more features, or want to help implementing some of those mentioned here, pull requests are welcome!
 
