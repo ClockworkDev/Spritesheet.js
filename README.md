@@ -68,7 +68,24 @@ To start using the library follow this steps:
 ```
 
 ##FAQ
-Coming soon!
+  - *Should I use this library?*
+  
+  If you are developing an app, game or webpage in HTML/JS that needs to use 2D animations using spritesheets, this library is for you! If you need 3D or vector animation, this library won't help you (unless you want to embed your vector drawing code in custom 'code' frames, or use this library to render 'animated' textures for your 3d meshes).
+
+  - *Where should I start?*
+  
+  Start running and reading the examples to see how to use the library, and you should read the xml files with the spritesheets.
+
+  - *The examples don't work, I only see a blank screen!*
+
+  The library uses an XMLHTTPRequest to fetch the spritesheet, so you should either use the library on the server or use Firefox, which doesn't block the loading of local files (other browsers do it for security reasons).
+  
+  - *What are the advantages of using the library?*
+  
+  First of all, you don't have to write code to handle animations, it is as easy as using the library. But there are also other benefits: the modular nature of the spritesheets allow to reuse animations between projects, or redraw and reanimate everything, without writing a single line of code. 
+
+  If you work in a team, the animators probably will not be involved in the code: with this library you can let them write the spritesheets, test them and work independiently without having to be constantly asking for modifications in your code base.
+
 ##Examples
 Check out [examples/example1.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example1.html) to see a quick example that shows various features, and you should also read [examples/spritesheets.xml](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/spritesheets.xml) to see the spritesheet structure.
 
@@ -89,6 +106,8 @@ These features will be added to the library:
   Frames will be able to play sound files, allowing to integrate animations and sound effects
   - **Several optimizations**:
   For example, the library doesn't take into account which objects are actually in the screen area, so it renders everything. That should be fixed.
+  - **Spritesheet viewer**:
+  A small utitlity to view the animations, to allow to write and test spritesheets as easy and fast as possible.
 
 These feaures are being considered:
   - **Cutscenes**:
