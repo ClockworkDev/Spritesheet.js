@@ -76,7 +76,7 @@ To start using the library follow this steps:
 
   - *Where should I start?*
   
-  Start running and reading the examples to see how to use the library, and you should read the xml files with the spritesheets. If you create an xml spritesheet, you can test it in the [viewer](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html) without having to write any code.
+  Start running and reading the examples to see how to use the library, and you should read the xml files with the spritesheets. If you create an xml spritesheet, you can test it in the [viewer](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html) without having to write any code. You should also read the complete list of functions in the doc directory.
 
   - *The examples don't work, I only see a blank screen!*
 
