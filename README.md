@@ -49,20 +49,28 @@ You can test the animations in the [viewer](https://github.com/arcadiogarcia/Spr
 ##Using the library
 To start using the library follow this steps:
   1. Include the .js file in your .html file.
+  
   `<script src="spritesheet.js"></script>`
   2. Instantiate the library. If you want to draw on several canvases, you will need adifferent instance for each one.
+  
   `var canvasAnimation = new Spritesheet();`
   3. Set up the library specifying a canvas and the frames per second.
+  
   `canvasAnimation.setUp(document.getElementById("canvas"), 30);`
   4. Choose a buffer size (the default is 1366x768).
+  
   `canvasAnimation.setBufferSize(800, 600);`
   5. Load one or several XML files with your spritesheets
+  
   ` canvasAnimation.asyncload("spritesheets.xml", callback_load);`
   6. Once the XML files have been loaded (you should use the callback to wait until that has happened), you can create objects that instantiate a spritesheet. Keep track of the ids generated to modify those objects.
+  
   `var object_id = canvasAnimation.addObject("Spritesheet", "State", 0, 0, 0, false, false);`
   7. Set the camera position if needed.
+  
   `canvasAnimation.setCamera(-650, 0);`
   8. You can modify the objects using their id, like in these examples.
+  
 ```
    canvasAnimation.setState(object_id, "SomeState");
    canvasAnimation.setX(object_id, 50);
