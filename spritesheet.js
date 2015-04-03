@@ -264,24 +264,31 @@ var Spritesheet = (function () {
     function sortZindex() {
         objectsorder = [];
         for (var i = 0; i < objects.length; i++) {
-            objectsorder[i] = { v: i, z: objects[i].zindex };
+            if (objects[i] != null) {
+                objectsorder[i] = { v: i, z: objects[i].zindex };
+            }
         }
         objectsorder.sort(function (a, b) { return a.z - b.z });
     }
 
     //This functions are public and are the only ones that should be used to control the engine
     return {
-        //The user must call this function
-        //The parameters are the canvas used for drawing and the fps
+        /**
+        * The user must call this function before starting to use the instance of the library
+        * @param {Canvas} canvas - The canvas that will be used
+        * @param {Number} nfps - The number of frames per second to be used
+        */
         setUp: function (mycanvas, nfps) {
-            canvas = mycanvas;  
+            canvas = mycanvas;
             realcontext = canvas.getContext('2d');
             //We loop renderprocess and renderdraw
             intervalholder = window.setInterval(renderprocess, Math.round(1000 / nfps));
             requestAnimationFrame(function renderdrawrequest() { renderdraw(); requestAnimationFrame(renderdrawrequest) });
             fps = nfps;
         },
-        //Call this function to make the canvas fullscreen
+        /**
+       * Call this function to make the canvas fullscreen
+       */
         setFullScreen: function () {
             canvas.style = "position:absolute;top:0px;left:0px;margin:0px;";
             canvas.width = window.innerWidth;
@@ -291,75 +298,133 @@ var Spritesheet = (function () {
                 canvas.height = window.innerHeight;
             };
         },
-        //This function pauses the 'time'... but it does no stop drawing
+        /**
+      * This function pauses the 'time'... but it does no stop drawing
+      */
         pauseAll: function () {
             window.clearInterval(intervalholder);
         },
-        //This function continues playing thr animation after calling pauseAll()
+        /**
+        *This function continues playing the animation after calling {@link pauseAll}
+        */
         restart: function () {
             intervalholder = window.setInterval(renderprocess, Math.round(1000 / nfps));
         },
-        //Set the camera position
+        /**
+        *Set the camera position
+        * @param {Number} x - The x position of the camera
+        * @param {Number} y - The y position of the camera
+        */
         setCamera: function (x, y) {
             camera.x = x;
             camera.y = y;
         },
-        //Move the camera in the x axis
+        /**
+        *Move the camera in the x axis
+        * @param {Number} x - The variation of the x position of the camera
+        */
         moveCameraX: function (x) {
             camera.x += x;
         },
-        //Move the camera in the y axis
+        /**
+        *Move the camera in the y axis
+        * @param {Number} y - The variation of the y position of the camera
+        */
         moveCameraY: function (y) {
             camera.y += y;
         },
-        //Load the XML with the data (async)
+        /**
+        *Load the XML with the data (async)
+        * @param {String} url - The url of the XML file
+        * @param {Function} funcion - A callback function
+        */
         asyncLoad: function (url, funcion) {
             loadXMLFile(url, realparse, funcion);
         },
-        //Add an object to the engine
-        //The paramaters specify the spritesheet, the state, the x, the y, whether it is static and whether its animation can be reversed
-        //The function return an identifier that must be stored to keep modifying the objects
+        /**
+        *Add an object to the engine
+        * @param {String} ss - The name of the spritesheet instantiated
+        * @param {String} st - The starting state of the object
+        * @param {Number} x - The x position of the object
+        * @param {Number} y - The y position of the object
+        * @param {Number} zindex - The z position of the object, indicates the rendering order
+        * @param {Boolean} isstatic - Whether the object is affected by camera movements
+        * @param {Boolean} doesnottimetravel - Whether the object animation can be played backwards
+        * @return {Number} The object identifier
+        */
         addObject: function (ss, st, x, y, zindex, isstatic, doesnottimetravel) {
             objects.push({ vars: {}, spritesheet: ss, state: st, x: x, y: y, t: 0, zindex: zindex || 0, isstatic: isstatic || false, doesnottimetravel: doesnottimetravel || false });
             sortZindex();
             return objects.length - 1;
         },
-        //Delete the object specified by the identifier
-        deleteObject: function (i) {
-            objects.splice(i, 1);
+        /**
+        *Delete the object specified by the identifier
+        * @param {Number} id - The id of the object
+        */
+        deleteObject: function (id) {
+            objects[id]=null;
         },
-        //Remove all the objects
+        /**Remove all the objects
+        */
         clear: function () {
             objects = [];
         },
-        //Pause the animation of an specific object
+        /**
+        *Pause the animation of an specific object
+        * @param {Number} id - The id of the object
+        */
         pause: function (id) {
             objects[id].pause = true;
         },
-        //Unpause the animation of an specific object
+        /**
+        *Unpause the animation of an specific object
+        * @param {Number} id - The id of the object
+        */
         unpause: function (id) {
             objects[id].pause = false;
         },
-        //Set the X coordinate of an object
+        /**
+        *Set the X coordinate of an object
+        * @param {Number} id - The id of the object
+        * @param {Number} x - The x coordinate
+        */
         setX: function (id, x) {
             objects[id].x = x;
         },
-        //Set the Y coordinate of an object
+        /**
+        *Set the Y coordinate of an object
+        * @param {Number} id - The id of the object
+        * @param {Number} iy - The y coordinate
+        */
         setY: function (id, y) {
             objects[id].y = y;
         },
-        //Set a custom parameter of an object
+        /**
+        *Set a custom parameter of an object
+        * @param {Number} id - The id of the object
+        * @param {String} variable - The name of the parameter
+        * @param {Object} value - The value of the parameter
+        */
         setParameter: function (id, variable, value) {
             objects[id].vars[variable] = value;
         },
-        //Set the Z index of an object
+        /**
+        *Set the Z index of an object
+        * @param {Number} id - The id of the object
+        * @param {Number} z - The zindex of the object
+        */
         setZindex: function (id, z) {
             if (objects[id].zindex != z) {
                 objects[id].zindex = z;
                 sortZindex();
             }
         },
-        //Set the state of an object
+        /**
+        *Set the state of an object
+        * @param {Number} id - The id of the object
+        * @param {String} s - The state of an object
+        * @return {Number} The timer of the animation that was being played, or NaN if this was already the current state
+        */
         setState: function (id, s) {
             if (objects[id].state != s) {
                 objects[id].state = s;
@@ -369,32 +434,56 @@ var Spritesheet = (function () {
             }
             return NaN;
         },
-        //Set the spritesheet of an object
+        /**
+        *Set the spritesheet of an object
+        * @param {Number} id - The id of the object
+        * @param {String} s - The spritesheet of an object
+        */
         setSpritesheet: function (id, s) {
             objects[id].spritesheet = s;
         },
-        //Set the time (inside its current animation) of an object
+        /**
+        *Set the time (inside its current animation) of an object
+        * @param {Number} id - The id of the object
+        * @param {Number} t - The timer
+        */
         setObjectTimer: function (id, t) {
             objects[id].t = t;
         },
-        //Get the time (inside its current animation) of an object
+        /**
+        *Get the time (inside its current animation) of an object
+        * @param {Number} id - The id of the object
+        * @returns The timer of the animation being played
+        */
         getObjectTimer: function (id) {
             return objects[id].t;
         },
-        //Reverse all the animations if set to true, restore them to normal if set to false
+        /**
+        *Reverse all the animations if set to true, restore them to normal if set to false
+        * @param {Boolean} value - Whether the animations should be reversed
+        */
         setBackwards: function (value) {
             goesbackwards = value;
         },
-        //Specify a new render mode
+        /**
+        *Specify a new render mode
+        * @param {Function} mode - The new render mode
+        */
         setRenderMode: function (mode) {
             rendermode = mode;
         },
-        //Set the default render mode
+        /**
+        *Use the default render mode 
+        */
         setRenderModeDefault: function () {
             rendermode = rendermode_default;
         },
-        //Set the size of the buffer canvas
-        setBufferSize: function (w,h) {
+        /**
+        *Set the size of the buffer canvas
+        * @param {Number} w - The width
+        * @param {Number} h - The height
+        */
+        setBufferSize: function (w, h) {
             buffercanvas.width = w;
             buffercanvas.height = h;
         }
@@ -443,7 +532,7 @@ var Spritesheet = (function () {
         }
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
-    
+
     }
 
     function getXMLHttpRequest() {
