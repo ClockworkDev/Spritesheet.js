@@ -1,5 +1,5 @@
 # Spritesheet.js
-A library to use spritesheet based animations in the HTML5 canvas. Spritesheets are images that contain all the assets needed to render one (or many) 2D animations on the screen, and are comonly used in (but not limited to) videogames. This library was originally developed for one of my games (Paradux, for the Imagine Cup), so some features are quite particular and they won't be needed in most of the common usage cases. Despite that, the library pretends to be generic enough to be used in almost any web/game/app that uses spritesheets, and be platform and device independent (that is the reason why some features, as rotation, were not initially considered).
+A library to use spritesheet based animations in the HTML5 canvas. Spritesheets are images that contain all the assets needed to render one (or many) 2D animations on the screen, and are comonly used in (but not limited to) videogames. This library is a fork of the one developed for one of my games (Paradux, for the Imagine Cup), so some features are quite particular and they won't be needed in most of the common usage cases. Despite that, the library pretends to be generic enough to be used in almost any web/game/app that uses spritesheets, and be platform and device independent (that is the reason why some features, as rotation, were not initially considered).
 ## Main concepts
 There are four levels to consider when designing a spritesheet:
 * **Frames**
@@ -108,6 +108,8 @@ These features will be added to the library:
   Frames will be able to play sound files, allowing to integrate animations and sound effects
   - **Several optimizations**:
   For example, the library doesn't take into account which objects are actually in the screen area, so it renders everything. That should be fixed.
+  - **More rendermodes**
+  Right now, only a default rendermode (that uses all the width available) is suplied with the library. Additional render modes will come preloaded to cover other common use cases (use all the height available, cover, contain...). They would basically mimic the background-size CSS property, to allow more control about how the buffer is drawn on the canvas.
 
 
 These feaures are being considered:
