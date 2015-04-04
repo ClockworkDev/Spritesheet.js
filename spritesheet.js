@@ -156,9 +156,26 @@ var Spritesheet = (function () {
                 }
 
 
+
                 if (frame.code == undefined) {
                     //If it is a frame from a file we draw it on the buffer
-                    context.drawImage(spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
+                    //But first we check if the frame is out of the screen
+                    var skip = false;
+                    if ((state.flip == 0 || state.flip == 2) && (xposition > buffercanvas.width || xposition + frame.w < 0)) {
+                        skip = true;
+                    }
+                    if ((state.flip == 0 || state.flip == 1) && (yposition > buffercanvas.height || yposition + frame.h < 0)) {
+                        skip = true;
+                    }
+                    if ((state.flip == 1 || state.flip == 3) && (xposition + flipoffsetx > 0 || xposition + flipoffsetx + frame.w < -buffercanvas.width)) {
+                        skip = true;
+                    }
+                    if ((state.flip == 2 || state.flip == 3) && (yposition + flipoffsety > 0 || yposition + flipoffsety + frame.h < -buffercanvas.height)) {
+                        skip = true;
+                    }
+                    if (!skip) {
+                        context.drawImage(spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
+                    }
                 } else {
                     //If it is a 'custom' frame, we execute the code
                     frame.code((+layer.x(object.t)) + (+object.x), (+layer.y(object.t)) + (+object.y), object.t, context, object.vars);

@@ -115,7 +115,7 @@ These features will be added to the library:
   - **Sounds**:
   Frames will be able to play sound files, allowing to integrate animations and sound effects
   - **Several optimizations**:
-  For example, the library doesn't take into account which objects are actually in the screen area, so it renders everything. That should be fixed.
+  ~~or example, the library doesn't take into account which objects are actually in the screen area, so it renders everything. That should be fixed.~~
   - **More rendermodes**
   Right now, only a default rendermode (that uses all the width available) is suplied with the library. Additional render modes will come preloaded to cover other common use cases (use all the height available, cover, contain...). They would basically mimic the background-size CSS property, to allow more control about how the buffer is drawn on the canvas.
 
