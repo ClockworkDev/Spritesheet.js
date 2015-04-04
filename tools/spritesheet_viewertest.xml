@@ -24,6 +24,12 @@
       <state name="Scare">
         <layer name="Scare1"></layer>
       </state>
+      <state name="ScareVerticalFlip" flip="v">
+        <layer name="Scare1"></layer>
+      </state>
+      <state name="ScareBothFlip" flip="hv">
+        <layer name="Scare1"></layer>
+      </state>
     </states>
 
     <layers>

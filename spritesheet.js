@@ -133,11 +133,23 @@ var Spritesheet = (function () {
 
                 //Maybe the image must be flipped in some axis
                 var flipoffsetx = 0;
+                var flipoffsety = 0;
                 switch (state.flip) {
                     case 1:
                         context.save();
                         flipoffsetx = -2 * xposition - frame.w;
                         context.scale(-1, 1);
+                        break;
+                    case 2:
+                        context.save();
+                        flipoffsety = -2 * yposition - frame.h;
+                        context.scale(1, -1);
+                        break;
+                    case 3:
+                        context.save();
+                        flipoffsetx = -2 * xposition - frame.w;
+                        flipoffsety = -2 * yposition - frame.h;
+                        context.scale(-1, -1);
                         break;
                     default:
                         break;
@@ -146,7 +158,7 @@ var Spritesheet = (function () {
 
                 if (frame.code == undefined) {
                     //If it is a frame from a file we draw it on the buffer
-                    context.drawImage(spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition, frame.w, frame.h);
+                    context.drawImage(spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
                 } else {
                     //If it is a 'custom' frame, we execute the code
                     frame.code((+layer.x(object.t)) + (+object.x), (+layer.y(object.t)) + (+object.y), object.t, context, object.vars);
@@ -155,6 +167,8 @@ var Spritesheet = (function () {
                 //If we flipped before then we restore everything
                 switch (state.flip) {
                     case 1:
+                    case 2:
+                    case 3:
                         context.restore();
                         break;
                     default:
@@ -244,10 +258,22 @@ var Spritesheet = (function () {
                     newstate.layers.push(findwhere(newspritesheet.layers, "name", layerxml.getAttributeNode("name").value));
                 }
                 if (newstatexml.getAttributeNode("flip") != null) {
-                    if (newstatexml.getAttributeNode("flip").value == "h") {
-                        newstate.flip = 1
-                    } else {
-                        newstate.flip = 0;
+                    switch (newstatexml.getAttributeNode("flip").value) {
+                        case "h":
+                            newstate.flip = 1;
+                            break;
+                        case "v":
+                            newstate.flip = 2;
+                            break;
+                        case "hv":
+                            newstate.flip = 3;
+                            break;
+                        case "vh":
+                            newstate.flip = 3;
+                            break;
+                        default:
+                            newstate.flip = 0;
+                            break;
                     }
                 } else {
                     newstate.flip = 0;
@@ -362,7 +388,7 @@ var Spritesheet = (function () {
         * @param {Number} id - The id of the object
         */
         deleteObject: function (id) {
-            objects[id]=null;
+            objects[id] = null;
         },
         /**Remove all the objects
         */
