@@ -105,6 +105,8 @@ Check out [examples/example3.html](https://github.com/arcadiogarcia/Spritesheet.
 
 Check out [examples/example4.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example4.html) to see when to use static objects and how to use custom 'code frames'.
 
+Check out [examples/example5.html](https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example5.html) to see the preloaded render modes in action.
+
 Thanks to [Silvia Barbero](http://silvishinystar.deviantart.com/) for allowing me to use her dog sprite!
 
 If you have used Spritesheet.js in a project, or you have just made a nice demo, you can ask to be featured in this section!
