@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<spritesheets>
+  <spritesheet name="Resize" src="resize.png">
+
+    <states>
+      <state name="a">
+        <layer name="a"></layer>
+      </state>
+    </states>
+
+    <layers>
+      <layer name="a" x="0" y="0">
+        <frame name="a"></frame>
+      </layer>
+     
+    </layers>
+
+    <frames>
+      <frame name="a" x="0" y="0" w="800" h="600" t="0"></frame>
+     
+    </frames>
+
+  </spritesheet>
+
+  
+
+</spritesheets>
