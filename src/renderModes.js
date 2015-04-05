@@ -27,6 +27,7 @@ SPJS.renderModes.maxHeight = function (contextinput, contextoutput) {
 SPJS.renderModes.contain = function (contextinput, contextoutput) {
     contextoutput.clearRect(0, 0, contextoutput.canvas.width, contextoutput.canvas.height);
     //All the width available will be used, the aspect ratio will be the same and the image will be centered vertically
+    if (contextoutput.canvas.width / contextinput.canvas.width < contextoutput.canvas.height / contextinput.canvas.height) {
         var xpos = 0;
         var ypos = (contextoutput.canvas.height - contextinput.canvas.height * contextoutput.canvas.width / contextinput.canvas.width) / 2;
         var width = contextoutput.canvas.width;
@@ -56,4 +57,3 @@ SPJS.renderModes.cover = function (contextinput, contextoutput) {
     }
     contextoutput.drawImage(contextinput.canvas, xpos, ypos, width, height);
 };
-
