@@ -19,7 +19,7 @@ There are four levels to consider when designing a spritesheet:
 For example, when animating a person walking, there could be two states: "Idle" and "Walking". Each state could be formed by several layers: "Body", "Arms", "Legs", and some layers could be reused in both states. Each layer could have several frames with the sucessive steps of the animation. Finally, the spritesheet should contain all of them, plus a reference to "someone_walking.png". 
 ##Writing the spritesheet with XML
 A XML file can describe one or multiple spritesheets and has the following structure:
-```
+```xml
 <spritesheets>
  <spritesheet name="Something" src="path/something.png">
     <states>
@@ -50,32 +50,46 @@ You can test the animations in the [viewer](https://github.com/arcadiogarcia/Spr
 To start using the library follow this steps:
   1. Include the .js file in your .html file.
   
-  `<script src="spritesheet.js"></script>`
-  2. Instantiate the library. If you want to draw on several canvases, you will need adifferent instance for each one.
+  ```html
+<script src="spritesheet.js"></script>
+  ```
+  2. Instantiate the library. If you want to draw on several canvases, you will need a different instance for each one.
   
-  `var canvasAnimation = new Spritesheet();`
+  ```javascript
+var canvasAnimation = new Spritesheet();
+  ```
   3. Set up the library specifying a canvas and the frames per second.
   
-  `canvasAnimation.setUp(document.getElementById("canvas"), 30);`
+  ```javascript
+canvasAnimation.setUp(document.getElementById("canvas"), 30);
+ ```
   4. Choose a buffer size (the default is 1366x768).
   
-  `canvasAnimation.setBufferSize(800, 600);`
+  ```javascript
+  canvasAnimation.setBufferSize(800, 600);
+   ```
   5. Load one or several XML files with your spritesheets
   
-  ` canvasAnimation.asyncload("spritesheets.xml", callback_load);`
+  ```javascript
+canvasAnimation.asyncload("spritesheets.xml", callback_load);
+ ```
   6. Once the XML files have been loaded (you should use the callback to wait until that has happened), you can create objects that instantiate a spritesheet. Keep track of the ids generated to modify those objects.
   
-  `var object_id = canvasAnimation.addObject("Spritesheet", "State", 0, 0, 0, false, false);`
+  ```javascript
+  var object_id = canvasAnimation.addObject("Spritesheet", "State", 0, 0, 0, false, false);
+   ```
   7. Set the camera position if needed.
   
-  `canvasAnimation.setCamera(-650, 0);`
+  ```javascript
+canvasAnimation.setCamera(-650, 0);
+ ```
   8. You can modify the objects using their id, like in these examples.
   
-```
-   canvasAnimation.setState(object_id, "SomeState");
-   canvasAnimation.setX(object_id, 50);
-   canvasAnimation.moveX(20);
-```
+ ```javascript
+  canvasAnimation.setState(object_id, "SomeState");
+  canvasAnimation.setX(object_id, 50);
+  canvasAnimation.moveX(20);
+ ```
 
 ##FAQ
   - *Should I use this library?*
