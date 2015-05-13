@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Spritesheet.js by arcadiogarcia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Spritesheet.js</h1>
+      <h2 class="project-tagline">A library to use spritesheet based animations in the HTML5 canvas</h2>
+      <a href="https://github.com/arcadiogarcia/Spritesheet.js" class="btn">View on GitHub</a>
+      <a href="https://github.com/arcadiogarcia/Spritesheet.js/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/arcadiogarcia/Spritesheet.js/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="spritesheetjs" class="anchor" href="#spritesheetjs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Spritesheet.js</h1>
+
+<p>A library to use spritesheet based animations in the HTML5 canvas. Spritesheets are images that contain all the assets needed to render one (or many) 2D animations on the screen, and are comonly used in (but not limited to) videogames. This library is a fork of the one developed for one of my games (Paradux, for the Imagine Cup), so some features are quite particular and they won't be needed in most of the common usage cases. Despite that, the library pretends to be generic enough to be used in almost any web/game/app that uses spritesheets, and be platform and device independent (that is the reason why some features, as rotation, were not initially considered).</p>
+
+<h2>
+<a id="main-concepts" class="anchor" href="#main-concepts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Main concepts</h2>
+
+<p>There are four levels to consider when designing a spritesheet:</p>
+
+<ul>
+<li>
+<strong>Frames</strong>
+
+<ul>
+<li>Frames are just squares cropped from the image, and therefore are defined by
+
+<ul>
+<li>X position</li>
+<li>Y position</li>
+<li>Width</li>
+<li>Height</li>
+<li>A frame duration (t) must also be specified, it indicates how long will that frame be shown in the screen. A duration of 0 means that that frame will be shown as long as the animation continues.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<strong>Layers</strong>
+
+<ul>
+<li>Layers are ordered sets of frames that are displayed one after the other. Therefore they are defined by a list of frames, and they can also be moved specifying two functions: x(t) and y(t)</li>
+</ul>
+</li>
+<li>
+<strong>States</strong>
+
+<ul>
+<li>States are a set of layers that are displayed at the same time on the screen, overlaying if necessary. Therefore they are just a list of layers.</li>
+</ul>
+</li>
+<li>
+<strong>Spritesheet</strong>
+
+<ul>
+<li>Spritesheets are the set of states, plus all of their associated layers and frames, and the image from which the frames should be extracted.</li>
+</ul>
+</li>
+</ul>
+
+<p>For example, when animating a person walking, there could be two states: "Idle" and "Walking". Each state could be formed by several layers: "Body", "Arms", "Legs", and some layers could be reused in both states. Each layer could have several frames with the sucessive steps of the animation. Finally, the spritesheet should contain all of them, plus a reference to "someone_walking.png". </p>
+
+<h2>
+<a id="writing-the-spritesheet-with-xml" class="anchor" href="#writing-the-spritesheet-with-xml" aria-hidden="true"><span class="octicon octicon-link"></span></a>Writing the spritesheet with XML</h2>
+
+<p>A XML file can describe one or multiple spritesheets and has the following structure:</p>
+
+<div class="highlight highlight-xml"><pre>&lt;<span class="pl-ent">spritesheets</span>&gt;
+ &lt;<span class="pl-ent">spritesheet</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>Something<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>path/something.png<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">states</span>&gt;
+      &lt;<span class="pl-ent">state</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>State1<span class="pl-pds">"</span></span>&gt;
+        &lt;<span class="pl-ent">layer</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>Layer1<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">layer</span>&gt;
+        ...
+      &lt;/<span class="pl-ent">state</span>&gt;
+      ...
+    &lt;/<span class="pl-ent">states</span>&gt;
+    &lt;<span class="pl-ent">layers</span>&gt;
+       &lt;<span class="pl-ent">layer</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>Layer1<span class="pl-pds">"</span></span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span>&gt;
+        &lt;<span class="pl-ent">frame</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>Frame1<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">frame</span>&gt;
+        ...
+      &lt;/<span class="pl-ent">layer</span>&gt;
+      ...
+    &lt;/<span class="pl-ent">layers</span>&gt;
+    &lt;<span class="pl-ent">frames</span>&gt;
+      &lt;<span class="pl-ent">frame</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>Frame1<span class="pl-pds">"</span></span> <span class="pl-e">x</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">y</span>=<span class="pl-s"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-e">w</span>=<span class="pl-s"><span class="pl-pds">"</span>100<span class="pl-pds">"</span></span> <span class="pl-e">h</span>=<span class="pl-s"><span class="pl-pds">"</span>50<span class="pl-pds">"</span></span> <span class="pl-e">t</span>=<span class="pl-s"><span class="pl-pds">"</span>30<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">frame</span>&gt;
+      ...
+    &lt;/<span class="pl-ent">frames</span>&gt;
+  &lt;/<span class="pl-ent">spritesheet</span>&gt;
+  ...
+&lt;/<span class="pl-ent">spritesheets</span>&gt;</pre></div>
+
+<p>You can test the animations in the <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html">viewer</a>.</p>
+
+<h2>
+<a id="using-the-library" class="anchor" href="#using-the-library" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the library</h2>
+
+<p>To start using the library follow this steps:</p>
+
+<ol>
+<li>
+<p>Include the .js file in your .html file.</p>
+
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>spritesheet.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+</li>
+<li>
+<p>Instantiate the library. If you want to draw on several canvases, you will need a different instance for each one.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> canvasAnimation <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Spritesheet</span>();</pre></div>
+</li>
+<li>
+<p>Set up the library specifying a canvas and the frames per second.</p>
+
+<div class="highlight highlight-javascript"><pre>canvasAnimation.setUp(<span class="pl-c1">document</span>.<span class="pl-c1">getElementById</span>(<span class="pl-s"><span class="pl-pds">"</span>canvas<span class="pl-pds">"</span></span>), <span class="pl-c1">30</span>);</pre></div>
+</li>
+<li>
+<p>Choose a buffer size (the default is 1366x768).</p>
+
+<div class="highlight highlight-javascript"><pre>canvasAnimation.setBufferSize(<span class="pl-c1">800</span>, <span class="pl-c1">600</span>);</pre></div>
+</li>
+<li>
+<p>Load one or several XML files with your spritesheets</p>
+
+<div class="highlight highlight-javascript"><pre>canvasAnimation.asyncload(<span class="pl-s"><span class="pl-pds">"</span>spritesheets.xml<span class="pl-pds">"</span></span>, callback_load);</pre></div>
+</li>
+<li>
+<p>Once the XML files have been loaded (you should use the callback to wait until that has happened), you can create objects that instantiate a spritesheet. Keep track of the ids generated to modify those objects.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> object_id <span class="pl-k">=</span> canvasAnimation.addObject(<span class="pl-s"><span class="pl-pds">"</span>Spritesheet<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>State<span class="pl-pds">"</span></span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-c1">false</span>, <span class="pl-c1">false</span>);</pre></div>
+</li>
+<li>
+<p>Set the camera position if needed.</p>
+
+<div class="highlight highlight-javascript"><pre>canvasAnimation.setCamera(<span class="pl-k">-</span><span class="pl-c1">650</span>, <span class="pl-c1">0</span>);</pre></div>
+</li>
+<li>
+<p>You can modify the objects using their id, like in these examples.</p>
+
+<div class="highlight highlight-javascript"><pre>canvasAnimation.setState(object_id, <span class="pl-s"><span class="pl-pds">"</span>SomeState<span class="pl-pds">"</span></span>);
+canvasAnimation.setX(object_id, <span class="pl-c1">50</span>);
+canvasAnimation.moveX(<span class="pl-c1">20</span>);</pre></div>
+</li>
+</ol>
+
+<h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span class="octicon octicon-link"></span></a>FAQ</h2>
+
+<ul>
+<li>
+<p><em>Should I use this library?</em></p>
+
+<p>If you are developing an app, game or webpage in HTML/JS that needs to use 2D animations using spritesheets, this library is for you! If you need 3D or vector animation, this library won't help you (unless you want to embed your vector drawing code in custom 'code' frames, or use this library to render 'animated' textures for your 3d meshes).</p>
+</li>
+<li>
+<p><em>Where should I start?</em></p>
+
+<p>Start running and reading the examples to see how to use the library, and you should read the xml files with the spritesheets. If you create an xml spritesheet, you can test it in the <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html">viewer</a> without having to write any code. You should also read the complete list of functions in the doc directory.</p>
+</li>
+<li>
+<p><em>The examples don't work, I only see a blank screen!</em></p>
+
+<p>The library uses an XMLHTTPRequest to fetch the spritesheet, so you should either use the library on the server or use Firefox, which doesn't block the loading of local files (other browsers do it for security reasons).</p>
+</li>
+<li>
+<p><em>What are the advantages of using the library?</em></p>
+
+<p>First of all, you don't have to write code to handle animations, it is as easy as using the library. But there are also other benefits: the modular nature of the spritesheets allow to reuse animations between projects, or redraw and reanimate everything, without writing a single line of code. </p>
+
+<p>If you work in a team, the animators probably will not be involved in the code: with this library you can let them write the spritesheets, test them and work independiently using the <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/tools/viewer.html">viewer</a> without having to be constantly asking for modifications in your code base.</p>
+</li>
+</ul>
+
+<h2>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example1.html">examples/example1.html</a> to see a quick example that shows various features, and you should also read <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/spritesheets.xml">examples/spritesheets.xml</a> to see the spritesheet structure.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example2.html">examples/example2.html</a> to see how to use custom render modes.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example3.html">examples/example3.html</a> to see how to use the Zindex to make '3d' animations.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example4.html">examples/example4.html</a> to see when to use static objects and how to use custom 'code frames'.</p>
+
+<p>Check out <a href="https://github.com/arcadiogarcia/Spritesheet.js/blob/master/examples/example5.html">examples/example5.html</a> to see the preloaded render modes in action.</p>
+
+<p>Thanks to <a href="http://silvishinystar.deviantart.com/">Silvia Barbero</a> for allowing me to use her dog sprite!</p>
+
+<p>If you have used Spritesheet.js in a project, or you have just made a nice demo, you can ask to be featured in this section!</p>
+
+<h2>
+<a id="known-bugs" class="anchor" href="#known-bugs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known bugs</h2>
+
+<p>There are no known bugs, if you find one please report it! (or even better, fix it yourself and submit a pull request)</p>
+
+<h2>
+<a id="roadmap" class="anchor" href="#roadmap" aria-hidden="true"><span class="octicon octicon-link"></span></a>Roadmap</h2>
+
+<p>These features will be added to the library:</p>
+
+<ul>
+<li>
+<strong>Sounds</strong>:
+Frames will be able to play sound files, allowing to integrate animations and sound effects</li>
+<li>
+<strong>Several optimizations</strong>:
+<del>For example, the library doesn't take into account which objects are actually in the screen area, so it renders everything. That should be fixed.</del> Done!</li>
+<li>
+<strong>More rendermodes</strong>
+<del>Right now, only a default rendermode (that uses all the width available) is suplied with the library. Additional render modes will come preloaded to cover other common use cases (use all the height available, cover, contain...). They would basically mimic the background-size CSS property, to allow more control about how the buffer is drawn on the canvas.</del> Done!</li>
+</ul>
+
+<p>These feaures are being considered:</p>
+
+<ul>
+<li>
+<strong>Cutscenes</strong>:
+Preset animations that specify the movement of instanciated objects, it could be used to create movies, cutscenes or any kind of non-interactive animation.</li>
+<li>
+<strong>Spritesheet creator</strong>:
+A small utitlity to create the animations, drawing squares to create the frames and grouping them in layers and states.</li>
+</ul>
+
+<p>If you have ideas for more features, or want to help implementing some of those mentioned here, pull requests are welcome!</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/arcadiogarcia/Spritesheet.js">Spritesheet.js</a> is maintained by <a href="https://github.com/arcadiogarcia">arcadiogarcia</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
