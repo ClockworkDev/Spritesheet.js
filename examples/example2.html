@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Spritesheet.js example</title>
+    <script src="../src/spritesheet.js"></script>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="400"></canvas>
+    <div id="log"></div>
+    <script>
+        var canvasAnimation = new Spritesheet();
+        canvasAnimation.setUp(document.getElementById("canvas"), 30);
+        canvasAnimation.setBufferSize(800, 600);
+        //This function will be called when the xml is loaded
+        var callback_load = function () {
+            document.getElementById("log").innerHTML += "XML file loaded!  ";
+            //The beach is a good example on how can you reuse the frames
+            //And set their x and y coordinates using matematical functions
+            var beach_id = canvasAnimation.addObject("Beach", "Beach", 0, 0, -5, false, false);
+            document.getElementById("log").innerHTML += "Beach added!  ";
+            //The dog must have a zindex greater than the one specified for the beach to be visible (0 > -5)
+            var dog_id = canvasAnimation.addObject("Paradog", "Idle", 800, 250, 0, false, false);
+            document.getElementById("log").innerHTML += "Dog added!  ";
+            var dog_state = 0;
+            //Move the camera to show the dog
+            canvasAnimation.setCamera(650, 0);
+            document.getElementById("log").innerHTML += "Camera set!  ";
+            var dog_x = 800;
+            var dog_direction = 1;
+            window.setInterval(function () {
+                switch (dog_state) {
+                    //Idle
+                    case 0:
+                        canvasAnimation.setState(dog_id, "Idle");
+                        if (Math.random() < 0.05) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                        //Run
+                    case 1:
+                        if (dog_x < 200 || dog_x > 1250) {
+                            dog_direction *= -1;
+                        }
+                        switch (dog_direction) {
+                            case 1:
+                                //When the dog moves we also move the camera to keep it centered
+                                canvasAnimation.setState(dog_id, "RunR");
+                                canvasAnimation.moveCameraX(20);
+                                dog_x += 20;
+                                break;
+                            case -1:
+                                //Check out the spritesheet to see how easy is to flip the dog!
+                                canvasAnimation.setState(dog_id, "RunL");
+                                canvasAnimation.moveCameraX(-20);
+                                dog_x -= 20;
+                                break;
+                        }
+                        canvasAnimation.setX(dog_id, dog_x);
+                        if (Math.random() < 0.03) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                        //Bark
+                    case 2:
+                        //Changing the state of an object is as easy as calling this function
+                        canvasAnimation.setState(dog_id, "Bark");
+                        if (Math.random() < 0.09) {
+                            dog_state = Math.floor(Math.random() * 3);
+                        }
+                        break;
+                }
+            }, 100);
+        };
+        var customRenderMode = function (contextinput, contextoutput) {
+            contextoutput.clearRect(0, 0, contextoutput.canvas.width, contextoutput.canvas.height);
+            var imageData = contextinput.getImageData(0, 0, contextinput.canvas.width, contextinput.canvas.height);
+            var pixels = imageData.data;
+
+            var imageDataOut = contextinput.getImageData(0, 0, contextoutput.canvas.width, contextoutput.canvas.height);
+            var pixelsOut = imageDataOut.data;
+            // Once we get the image data, we can play with it
+            //Calculations are done in the CPU, which is not optimal, but seems to run without issues
+            for (var i = 0, il = pixels.length; i < il; i += 4) {
+                //The anaglyhp algrithm:
+                //Get each pixel intenisty, and color red and cyan with a small offset.
+                var grey = (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+                if ((i / 4) % contextinput.canvas.width < contextinput.canvas.width - 5) {
+                    pixelsOut[i + 1 + 20] = grey;
+                    pixelsOut[i + 2 + 20] = grey;
+                } else {
+                    pixelsOut[i + 1 + 20] = 0;
+                    pixelsOut[i + 2 + 20] = 0;
+                }
+                if ((i / 4) % contextinput.canvas.width > 5) {
+                    pixelsOut[i - 20] = grey;
+                } else {
+                    pixelsOut[i - 20] = 0;
+                }
+            }
+
+            contextoutput.putImageData(imageDataOut, 0, 0);
+        };
+
+        canvasAnimation.setRenderMode(customRenderMode);
+
+        //For security reasons, IE (and maybe other browsers) won't let you load local files by default
+        //IF (YOU ARE DEVELOPING AN APP OR WEB APP){
+        //It is recommended to load the XML and PNG from the server
+        //If you need to make run it offline, for testing purposes Firefox seems to work fine
+        //} ELSE IF (YOU ARE DEVELOPING AN APP WITH APACHE CORDOVA){
+        //When encapsulated inside an Apache Cordova app, you will be able to load local files without issues
+        //}
+
+        canvasAnimation.asyncLoad("spritesheets.xml", callback_load);
+
+    </script>
+</body>
+</html>
