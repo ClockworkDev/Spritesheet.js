@@ -77,12 +77,12 @@ var Spritesheet = (function () {
     //And then it copies it to the screen using the rendermode
     function renderdraw() {
         //First we clear the context
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, buffercanvas.width, buffercanvas.height);
         //For each object
         for (var i = 0; i < objectsorder.length; i++) {
             //We get the object in that position acoording to the zindex
             var object = objects[objectsorder[i].v];
-          
+
             //We get its spritesheet
             var spritesheet = searchWhere(spritesheets, "name", object.spritesheet);
             var state = spritesheet.states[0];
@@ -177,32 +177,32 @@ var Spritesheet = (function () {
                     if (!skip) {
                         context.drawImage(spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
                     }
-                    
+
                     //If we flipped before then we restore everything
                     switch (state.flip) {
-                             case 1:
-                             case 2:
-                             case 3:
-                                context.restore();
-                             break;
-                             default:
-                              break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            context.restore();
+                            break;
+                        default:
+                            break;
                     }
                 } else {
-                     //Code shouldnt flip?
-                     switch (state.flip) {
-                             case 1:
-                             case 2:
-                             case 3:
-                                context.restore();
-                             break;
-                             default:
-                              break;
-                     }
-                    
+                    //Code shouldnt flip?
+                    switch (state.flip) {
+                        case 1:
+                        case 2:
+                        case 3:
+                            context.restore();
+                            break;
+                        default:
+                            break;
+                    }
+
                     //If it is a 'custom' frame, we execute the code
                     frame.code(xposition, yposition, object.t, context, object.vars);
-                    
+
                 }
 
                 //If we flipped before then we restore everything
@@ -589,18 +589,30 @@ var Spritesheet = (function () {
     }
 
     function loadXMLFile(url, parser, callback) {
+        if (Windows) {
+            var uri = new Windows.Foundation.Uri("ms-appx:///"+ url);
+            Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).then(function (file) {
+                return Windows.Storage.FileIO.readTextAsync(file).then(function (result) {
+                    var xmlDoc = new Windows.Data.Xml.Dom.XmlDocument();
+                    xmlDoc.loadXml(result);
+                    parser(xmlDoc);
+                    if (callback != undefined) {
+                        callback();
+                    }
+                });
+            });
+        } else {
+            var xmlhttp = getXMLHttpRequest();
 
-        var xmlhttp = getXMLHttpRequest();
-
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                parser(xmlhttp.responseXML);
-                callback();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    parser(xmlhttp.responseXML);
+                    callback();
+                }
             }
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
         }
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
-
     }
 
     function getXMLHttpRequest() {
