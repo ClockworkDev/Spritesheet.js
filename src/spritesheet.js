@@ -125,11 +125,11 @@ var Spritesheet = (function () {
 
                 //If the object is static we dont take into account camera movements
                 if (object.isstatic == true) {
-                    var xposition = (+layer.x(object.t)) + (+object.x);
-                    var yposition = (+layer.y(object.t)) + (+object.y);
+                    var xposition = (+layer.x(object.t, object.vars)) + (+object.x);
+                    var yposition = (+layer.y(object.t, object.vars)) + (+object.y);
                 } else {
-                    var xposition = (+layer.x(object.t)) + (+object.x) - camera.x;
-                    var yposition = (+layer.y(object.t)) + (+object.y) - camera.y;
+                    var xposition = (+layer.x(object.t, object.vars)) + (+object.x) - camera.x;
+                    var yposition = (+layer.y(object.t, object.vars)) + (+object.y) - camera.y;
                 }
 
                 //Maybe the image must be flipped in some axis
@@ -278,8 +278,8 @@ var Spritesheet = (function () {
                 var newlayerxml = layersxml.getElementsByTagName("layer")[i];
                 var newlayer = new layer();
                 newlayer.name = newlayerxml.getAttributeNode("name").value;
-                newlayer.x = new Function("t", "return " + newlayerxml.getAttributeNode("x").value);
-                newlayer.y = new Function("t", "return " + newlayerxml.getAttributeNode("y").value);
+                newlayer.x = new Function("t","vars", "return " + newlayerxml.getAttributeNode("x").value);
+                newlayer.y = new Function("t","vars", "return " + newlayerxml.getAttributeNode("y").value);
                 for (var j = 0; j < newlayerxml.getElementsByTagName("frame").length; j++) {
                     var framexml = newlayerxml.getElementsByTagName("frame")[j];
                     newlayer.frames.push(findwhere(newspritesheet.frames, "name", framexml.getAttributeNode("name").value));
@@ -589,19 +589,7 @@ var Spritesheet = (function () {
     }
 
     function loadXMLFile(url, parser, callback) {
-        if (Windows) {
-            var uri = new Windows.Foundation.Uri("ms-appx:///"+ url);
-            Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).then(function (file) {
-                return Windows.Storage.FileIO.readTextAsync(file).then(function (result) {
-                    var xmlDoc = new Windows.Data.Xml.Dom.XmlDocument();
-                    xmlDoc.loadXml(result);
-                    parser(xmlDoc);
-                    if (callback != undefined) {
-                        callback();
-                    }
-                });
-            });
-        } else {
+
             var xmlhttp = getXMLHttpRequest();
 
             xmlhttp.onreadystatechange = function () {
@@ -612,7 +600,6 @@ var Spritesheet = (function () {
             }
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
-        }
     }
 
     function getXMLHttpRequest() {
