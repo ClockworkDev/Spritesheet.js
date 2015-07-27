@@ -138,7 +138,7 @@ These features will be added to the library:
 
 These feaures are being considered:
   - **Cutscenes**:
-  Preset animations that specify the movement of instanciated objects, it could be used to create movies, cutscenes or any kind of non-interactive animation.
+  ~~Preset animations that specify the movement of instanciated objects, it could be used to create movies, cutscenes or any kind of non-interactive animation.~~ Work in progress, but it will probably be released separately as another library
   - **Spritesheet creator**:
   A small utitlity to create the animations, drawing squares to create the frames and grouping them in layers and states.
 
