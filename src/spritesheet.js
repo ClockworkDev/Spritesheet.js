@@ -125,11 +125,11 @@ var Spritesheet = (function () {
 
                 //If the object is static we dont take into account camera movements
                 if (object.isstatic == true) {
-                    var xposition = (+layer.x(object.t)) + (+object.x);
-                    var yposition = (+layer.y(object.t)) + (+object.y);
+                    var xposition = (+layer.x(object.t, object.vars)) + (+object.x);
+                    var yposition = (+layer.y(object.t, object.vars)) + (+object.y);
                 } else {
-                    var xposition = (+layer.x(object.t)) + (+object.x) - camera.x;
-                    var yposition = (+layer.y(object.t)) + (+object.y) - camera.y;
+                    var xposition = (+layer.x(object.t, object.vars)) + (+object.x) - camera.x;
+                    var yposition = (+layer.y(object.t, object.vars)) + (+object.y) - camera.y;
                 }
 
                 //Maybe the image must be flipped in some axis
@@ -175,7 +175,7 @@ var Spritesheet = (function () {
                         skip = true;
                     }
                     if (!skip) {
-                        context.drawImage(spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
+                        context.drawImage(object.img||spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
                     }
 
                     //If we flipped before then we restore everything
@@ -228,6 +228,9 @@ var Spritesheet = (function () {
     //It just increments each object timer if needed
     function renderprocess() {
         for (var i = 0; i < objects.length; i++) {
+            if (objectsorder[i] == undefined) {
+                break;
+            }
             var object = objects[objectsorder[i].v];
 
             if (object.pause != true) {
@@ -236,13 +239,23 @@ var Spritesheet = (function () {
                 } else {
                     object.t += 1000 / fps;
                 }
+                var spritesheet = searchWhere(spritesheets, "name", object.spritesheet);
+                var state = spritesheet.states[0];
+                if (object.state != undefined) {
+                    state = searchWhere(spritesheet.states, "name", object.state);
+                }
+                if (object.t > state.totalduration) {
+                    if (object.callback) {
+                        object.callback();
+                        object.callback = undefined;
+                    }
+                }
             }
         }
     }
 
     //This function loads the xml doument data
     function realparse(xmlDoc) {
-
 
         for (var k = 0; k < xmlDoc.getElementsByTagName("spritesheet").length; k++) {
 
@@ -278,8 +291,8 @@ var Spritesheet = (function () {
                 var newlayerxml = layersxml.getElementsByTagName("layer")[i];
                 var newlayer = new layer();
                 newlayer.name = newlayerxml.getAttributeNode("name").value;
-                newlayer.x = new Function("t", "return " + newlayerxml.getAttributeNode("x").value);
-                newlayer.y = new Function("t", "return " + newlayerxml.getAttributeNode("y").value);
+                newlayer.x = new Function("t", "vars", "return " + newlayerxml.getAttributeNode("x").value);
+                newlayer.y = new Function("t", "vars", "return " + newlayerxml.getAttributeNode("y").value);
                 for (var j = 0; j < newlayerxml.getElementsByTagName("frame").length; j++) {
                     var framexml = newlayerxml.getElementsByTagName("frame")[j];
                     newlayer.frames.push(findwhere(newspritesheet.frames, "name", framexml.getAttributeNode("name").value));
@@ -289,14 +302,18 @@ var Spritesheet = (function () {
             }
 
 
+
             var statesxml = thisspritesheet.getElementsByTagName("states")[0];
             for (var i = 0; i < statesxml.getElementsByTagName("state").length; i++) {
                 var newstatexml = statesxml.getElementsByTagName("state")[i];
                 var newstate = new state();
                 newstate.name = newstatexml.getAttributeNode("name").value;
+                newstate.totalduration = 0;
                 for (var j = 0; j < newstatexml.getElementsByTagName("layer").length; j++) {
                     var layerxml = newstatexml.getElementsByTagName("layer")[j];
-                    newstate.layers.push(findwhere(newspritesheet.layers, "name", layerxml.getAttributeNode("name").value));
+                    var thislayer = findwhere(newspritesheet.layers, "name", layerxml.getAttributeNode("name").value);
+                    newstate.totalduration = newspritesheet.layers[thislayer].t > newstate.totalduration ? newspritesheet.layers[thislayer].t : newstate.totalduration;
+                    newstate.layers.push(thislayer);
                 }
                 if (newstatexml.getAttributeNode("flip") != null) {
                     switch (newstatexml.getAttributeNode("flip").value) {
@@ -335,7 +352,15 @@ var Spritesheet = (function () {
                 objectsorder.push({ v: i, z: objects[i].zindex });
             }
         }
-        objectsorder.sort(function (a, b) { return a.z - b.z; });
+        objectsorder.sort(function (a, b) {
+            if (a.z != b.z) {
+                return a.z - b.z;
+            } else if (a.y != b.y) {
+                return a.y - b.y;
+            } else {
+                return b.x - a.x;
+            }
+        });
     }
 
     //This functions are public and are the only ones that should be used to control the engine
@@ -387,6 +412,13 @@ var Spritesheet = (function () {
             camera.y = y;
         },
         /**
+      *Get the camera position
+       * @return {Object} The camera coordinates
+      */
+        getCamera: function () {
+            return { x: camera.x, y: camera.y };
+        },
+        /**
         *Move the camera in the x axis
         * @param {Number} x - The variation of the x position of the camera
         */
@@ -407,6 +439,20 @@ var Spritesheet = (function () {
         */
         asyncLoad: function (url, funcion) {
             loadXMLFile(url, realparse, funcion);
+        },
+        /**
+      *Load many XML with the data (async)
+      * @param {String array} urls - The urls of the XML files
+      * @param {Function} funcion - A callback function
+      */
+        asyncLoadMultiple: function asyncLoadMultiple(urls, finalcallback) {
+            if (urls.length > 1) {
+                loadXMLFile(urls.shift(), realparse, function () {
+                    asyncLoadMultiple(urls, finalcallback);
+                });
+            } else {
+                loadXMLFile(urls[0], realparse, finalcallback);
+            }
         },
         /**
         *Add an object to the engine
@@ -511,6 +557,14 @@ var Spritesheet = (function () {
             objects[id].spritesheet = s;
         },
         /**
+       *Set the image of an object (keeps the spritesheet)
+       * @param {Number} id - The id of the object
+       * @param {Image} img - The image
+       */
+        setImage: function (id, img) {
+            objects[id].img = img;
+        },
+        /**
         *Set the time (inside its current animation) of an object
         * @param {Number} id - The id of the object
         * @param {Number} t - The timer
@@ -525,6 +579,14 @@ var Spritesheet = (function () {
         */
         getObjectTimer: function (id) {
             return objects[id].t;
+        },
+        /**
+        *Sets a callback to be played when the animation ends
+        * @param {Number} id - The id of the object
+        * @param {Function} callback - The function to be called
+        */
+        setEndedCallback: function (id, callback) {
+            objects[id].callback = callback;
         },
         /**
         *Reverse all the animations if set to true, restore them to normal if set to false
@@ -554,6 +616,13 @@ var Spritesheet = (function () {
         setBufferSize: function (w, h) {
             buffercanvas.width = w;
             buffercanvas.height = h;
+        },
+        /**
+    *Get the canvas context
+     * @return {Object} The context
+    */
+        getContext: function () {
+            return context;
         }
     };
 
@@ -589,30 +658,16 @@ var Spritesheet = (function () {
     }
 
     function loadXMLFile(url, parser, callback) {
-        if (Windows) {
-            var uri = new Windows.Foundation.Uri("ms-appx:///"+ url);
-            Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).then(function (file) {
-                return Windows.Storage.FileIO.readTextAsync(file).then(function (result) {
-                    var xmlDoc = new Windows.Data.Xml.Dom.XmlDocument();
-                    xmlDoc.loadXml(result);
-                    parser(xmlDoc);
-                    if (callback != undefined) {
-                        callback();
-                    }
-                });
-            });
-        } else {
-            var xmlhttp = getXMLHttpRequest();
+        var xmlhttp = getXMLHttpRequest();
 
-            xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    parser(xmlhttp.responseXML);
-                    callback();
-                }
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                parser(xmlhttp.responseXML);
+                callback();
             }
-            xmlhttp.open("GET", url, true);
-            xmlhttp.send();
         }
+        xmlhttp.open("GET", url, true);
+        xmlhttp.send();
     }
 
     function getXMLHttpRequest() {
