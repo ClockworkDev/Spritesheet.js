@@ -96,6 +96,9 @@ var Spritesheet = (function () {
                 context.globalAlpha = 1;
                 //We get the data corresponding to that layer
                 var layer_n = state.layers[j];
+                if(object.hiddenLayers[layer_n]==true){
+                    continue;
+                }
                 var layer = spritesheet.layers[layer_n];
 
                 //We calculate which frame should be drawn
@@ -466,7 +469,7 @@ var Spritesheet = (function () {
         * @return {Number} The object identifier
         */
         addObject: function (ss, st, x, y, zindex, isstatic, doesnottimetravel) {
-            objects.push({ vars: {}, spritesheet: ss, state: st, x: x, y: y, t: 0, zindex: zindex || 0, isstatic: isstatic || false, doesnottimetravel: doesnottimetravel || false });
+            objects.push({ vars: {}, spritesheet: ss, state: st, x: x, y: y, t: 0, zindex: zindex || 0, isstatic: isstatic || false, doesnottimetravel: doesnottimetravel || false, hiddenLayers:{}});
             sortZindex();
             return objects.length - 1;
         },
@@ -521,6 +524,12 @@ var Spritesheet = (function () {
         */
         setParameter: function (id, variable, value) {
             objects[id].vars[variable] = value;
+            if(variable.indexOf("$ShowLayer!")==0){
+                objects[id].hiddenLayers["value"]=undefined;
+            }
+            if(variable.indexOf("$HideLayer!")==0){
+                objects[id].hiddenLayers["value"]=true;
+            }
         },
         /**
         *Set the Z index of an object
