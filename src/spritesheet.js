@@ -525,10 +525,10 @@ var Spritesheet = (function () {
         setParameter: function (id, variable, value) {
             objects[id].vars[variable] = value;
             if(variable.indexOf("$ShowLayer!")==0){
-                objects[id].hiddenLayers["value"]=undefined;
+                objects[id].hiddenLayers[value]=undefined;
             }
             if(variable.indexOf("$HideLayer!")==0){
-                objects[id].hiddenLayers["value"]=true;
+                objects[id].hiddenLayers[value]=true;
             }
         },
         /**
