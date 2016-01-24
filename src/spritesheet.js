@@ -96,11 +96,11 @@ var Spritesheet = (function () {
                 context.globalAlpha = 1;
                 //We get the data corresponding to that layer
                 var layer_n = state.layers[j];
-                if(object.hiddenLayers[layer_n]==true){
+              
+                var layer = spritesheet.layers[layer_n];
+                if (object.hiddenLayers[layer.name] == true) {
                     continue;
                 }
-                var layer = spritesheet.layers[layer_n];
-
                 //We calculate which frame should be drawn
                 //We set k to the first frame of the layer
                 //And we add the duration of the frames until we reach current t
@@ -178,7 +178,7 @@ var Spritesheet = (function () {
                         skip = true;
                     }
                     if (!skip) {
-                        context.drawImage(object.img||spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
+                        context.drawImage(object.img || spritesheet.img, frame.x, frame.y, frame.w, frame.h, xposition + flipoffsetx, yposition + flipoffsety, frame.w, frame.h);
                     }
 
                     //If we flipped before then we restore everything
@@ -469,7 +469,7 @@ var Spritesheet = (function () {
         * @return {Number} The object identifier
         */
         addObject: function (ss, st, x, y, zindex, isstatic, doesnottimetravel) {
-            objects.push({ vars: {}, spritesheet: ss, state: st, x: x, y: y, t: 0, zindex: zindex || 0, isstatic: isstatic || false, doesnottimetravel: doesnottimetravel || false, hiddenLayers:{}});
+            objects.push({ vars: {}, spritesheet: ss, state: st, x: x, y: y, t: 0, zindex: zindex || 0, isstatic: isstatic || false, doesnottimetravel: doesnottimetravel || false, hiddenLayers: {} });
             sortZindex();
             return objects.length - 1;
         },
@@ -524,11 +524,11 @@ var Spritesheet = (function () {
         */
         setParameter: function (id, variable, value) {
             objects[id].vars[variable] = value;
-            if(variable.indexOf("$ShowLayer!")==0){
-                objects[id].hiddenLayers[value]=undefined;
+            if (variable.indexOf("$ShowLayer!") == 0) {
+                objects[id].hiddenLayers[value] = undefined;
             }
-            if(variable.indexOf("$HideLayer!")==0){
-                objects[id].hiddenLayers[value]=true;
+            if (variable.indexOf("$HideLayer!") == 0) {
+                objects[id].hiddenLayers[value] = true;
             }
         },
         /**
