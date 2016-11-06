@@ -7,6 +7,7 @@ var Spritesheet = (function () {
     var buffercanvas = document.createElement("canvas");
     buffercanvas.width = 1366;
     buffercanvas.height = 768;
+    var buffer_w = 1366, buffer_h = 768;
     //The context of the screen buffer
     //Everything should be written here
     //The 'real' context will only be modified when copying the buffer to the screen
@@ -21,6 +22,8 @@ var Spritesheet = (function () {
 
     //The camera allows to move the view without moving the individual sprites
     var camera = { x: 0, y: 0 };
+    //The zoom level
+    var zoom = 1;
 
 
     //Here we store the list of spritesheets
@@ -96,7 +99,7 @@ var Spritesheet = (function () {
                 context.globalAlpha = 1;
                 //We get the data corresponding to that layer
                 var layer_n = state.layers[j];
-              
+
                 var layer = spritesheet.layers[layer_n];
                 if (object.hiddenLayers[layer.name] == true) {
                     continue;
@@ -125,6 +128,14 @@ var Spritesheet = (function () {
                 //We finally have the frame that must be drawn
                 var frame = spritesheet.frames[layer.frames[k]];
 
+
+                //If it is a full texture frame, set the appropiate x,y,w,h
+                if (frame.fullTexture) {
+                    frame.x = frame.y = 0;
+                    var img = object.img || spritesheet.img;
+                    frame.w = img.width;
+                    frame.h = img.height;
+                }
 
                 //If the object is static we dont take into account camera movements
                 if (object.isstatic == true) {
@@ -278,10 +289,14 @@ var Spritesheet = (function () {
                 var newframe = new frame();
                 newframe.name = newframexml.getAttributeNode("name").value;
                 if (newframexml.getAttributeNode("code") == undefined) {
-                    newframe.x = +newframexml.getAttributeNode("x").value;
-                    newframe.y = +newframexml.getAttributeNode("y").value;
-                    newframe.w = +newframexml.getAttributeNode("w").value;
-                    newframe.h = +newframexml.getAttributeNode("h").value;
+                    if (newframexml.getAttributeNode("fullTexture") != undefined && newframexml.getAttributeNode("fullTexture").value) {
+                        newframe.fullTexture = true;
+                    } else {
+                        newframe.x = +newframexml.getAttributeNode("x").value;
+                        newframe.y = +newframexml.getAttributeNode("y").value;
+                        newframe.w = +newframexml.getAttributeNode("w").value;
+                        newframe.h = +newframexml.getAttributeNode("h").value;
+                    }
                 } else {
                     newframe.code = new Function("x", "y", "t", "context", "vars", newframexml.getAttributeNode("code").value);
                 }
@@ -623,8 +638,10 @@ var Spritesheet = (function () {
         * @param {Number} h - The height
         */
         setBufferSize: function (w, h) {
-            buffercanvas.width = w;
-            buffercanvas.height = h;
+            buffer_w = w;
+            buffer_h = h;
+            buffercanvas.width = w / zoom;
+            buffercanvas.height = h / zoom;
         },
         /**
     *Get the canvas context
@@ -632,6 +649,12 @@ var Spritesheet = (function () {
     */
         getContext: function () {
             return context;
+        },
+        setZoom: function (x) {
+            zoom = x;
+            context.setTransform(zoom, 0, 0, zoom, 0, 0);
+            buffercanvas.width = buffer_w / zoom;
+            buffercanvas.height = buffer_h / zoom;
         }
     };
 
