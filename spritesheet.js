@@ -1,4 +1,4 @@
-var RenderingLibrary = (function () {
+var Spritesheet = (function () {
 
     //Here is where you should put all your rendering code, which will be private
     //This canvas will be used as a buffer to store the image off-screen
@@ -91,11 +91,11 @@ var RenderingLibrary = (function () {
             //We get the object in that position acoording to the zindex
             var object = objects[objectsorder[i].v];
             //We get its spritesheet
-            var spritesheet = searchWhere(spritesheets, "name", object.spritesheet);
+            var spritesheet = object.spritesheet;
             var state = spritesheet.states[0];
             //We get the current state
             if (object.state != undefined) {
-                state = searchWhere(spritesheet.states, "name", object.state);
+                state = object.state;
             }
             //We loop over the layers of its current state
             for (var j in state.layers) {
@@ -364,18 +364,25 @@ var RenderingLibrary = (function () {
     var moveQuadtreeObject = function (element, oldx, oldy, newx, newy) {
         var bounds = objects[element].bounds;
         if (bounds == null) {
-            moveQuadtreeObjectCoordinates(element, oldx, oldy, newx, newy);
+            moveQuadtreeObjectPosition(element, oldx, oldy, newx, newy);
         } else {
             var oldxc = getQuadtreeCoordinate(oldx);
             var oldyc = getQuadtreeCoordinate(oldy);
             var newxc = getQuadtreeCoordinate(newx);
             var newyc = getQuadtreeCoordinate(newy);
-            moveQuadtreeObjectCoordinates(element, oldx, oldy, newx, newy);
+            moveQuadtreeObjectCoordinates(element, oldxc, oldyc, newxc, newyc);
 
-            moveQuadtreeObjectPositionIfDifferent(element, oldx, oldy, newx, newy, oldx - bounds.w, oldy - bounds.h, newx - bounds.w, newy - bounds.h);
-            moveQuadtreeObjectPositionIfDifferent(element, oldx, oldy, newx, newy, oldx - bounds.w, oldy + bounds.h, newx - bounds.w, newy + bounds.h);
-            moveQuadtreeObjectPositionIfDifferent(element, oldx, oldy, newx, newy, oldx + bounds.w, oldy - bounds.h, newx + bounds.w, newy - bounds.h);
-            moveQuadtreeObjectPositionIfDifferent(element, oldx, oldy, newx, newy, oldx + bounds.w, oldy + bounds.h, newx + bounds.w, newy + bounds.h);
+            var startx = getQuadtreeCoordinate(newx - bounds.w);
+            var endx = getQuadtreeCoordinate(newx + bounds.w);
+            var starty = getQuadtreeCoordinate(newy - bounds.h);
+            var endy = getQuadtreeCoordinate(newy + bounds.h);
+            if (oldxc != newxc || oldyc != newyc) {
+                for (var i = startx; i <= endx; i++) {
+                    for (var j = starty; j <= endy; j++) {
+                        moveQuadtreeObjectCoordinatesIfDifferent(element, oldxc, oldyc, newxc, newyc, oldxc + (i - newxc), oldyc + (j - newyc), i, j);
+                    }
+                }
+            }
         }
     }
     var moveQuadtreeObjectPosition = function (element, oldx, oldy, newx, newy) {
@@ -404,6 +411,14 @@ var RenderingLibrary = (function () {
         if (oldxc == newxc && oldyc == newyc) {
             return;
         }
+        if (oldxc != oldxc1 || oldyc != oldyc1) {
+            removeQuadtree(oldxc, oldyc, element);
+        }
+        if (newxc != newxc1 || newyc != newyc1) {
+            addQuadtree(newxc, newyc, element);
+        }
+    }
+    var moveQuadtreeObjectCoordinatesIfDifferent = function (element, oldxc1, oldyc1, newxc1, newyc1, oldxc, oldyc, newxc, newyc) {
         if (oldxc != oldxc1 || oldyc != oldyc1) {
             removeQuadtree(oldxc, oldyc, element);
         }
@@ -515,20 +530,26 @@ var RenderingLibrary = (function () {
         moveCameraZ: function (z) {
             //In this library this has no meaning so it does nothing
         },
-        loadSpritesheetJSONObject: function (inputSpritesheets) {
-            inputSpritesheets.forEach(function (inputSpritesheet) {
+        loadSpritesheetJSONObject: function (newspritesheets) {
+            spritesheets = spritesheets.concat(newspritesheets.map(function (s) {
+
                 var newspritesheet = new spritesheet();
-                newspritesheet.name = inputSpritesheet.name;
-                newspritesheet.img = new Image()
-                if (workingFolder) {
-                    newspritesheet.img.src = (workingFolder + "/" + s.src);
-                } else {
-                    newspritesheet.img.src = s.src;
+                newspritesheet.name = s.name;
+                if (s.src != undefined) {
+                    newspritesheet.img = new Image()
+                    if (workingFolder) {
+                        newspritesheet.img.src = (workingFolder + "/" + s.src);
+                    } else {
+                        newspritesheet.img.src = s.src;
+                    }
                 }
-                newspritesheet.frames = inputSpritesheet.frames.map(function (f) {
+                for (var name in s.frames) {
+                    var f = s.frames[name];
                     var newframe = new frame();
-                    newframe.name = f.name;
-                    if (!f.code) {
+                    newframe.name = name;
+                    if (f.code) {
+                        newframe.code = new Function("x", "y", "t", "context", "vars", f.code);
+                    } else {
                         if (f.fullTexture) {
                             newframe.fullTexture = true;
                         } else {
@@ -536,32 +557,33 @@ var RenderingLibrary = (function () {
                             newframe.y = f.y;
                             newframe.w = f.w;
                             newframe.h = f.h;
+                            newframe.t = f.t;
                         }
-                    } else {
-                        newframe.code = new Function("x", "y", "t", "context", "vars", f.code);
                     }
-                    newframe.t = f.t;
-                    return newframe;
-                });
-                newspritesheet.layers = inputSpritesheet.layers.map(function (l) {
+                    newspritesheet.frames.push(newframe);
+                }
+                for (var name in s.layers) {
+                    var l = s.layers[name];
                     var newlayer = new layer();
-                    newlayer.name = l.name;
+                    newlayer.name = name;
                     newlayer.x = new Function("t", "vars", "return " + l.x);
                     newlayer.y = new Function("t", "vars", "return " + l.y);
-                    newlayer.frames = l.frames.map(function (f) { return findwhere(newspritesheet.frames, "name", f) });
+                    newlayer.frames = l.frames.map(function (x) {
+                        return findwhere(newspritesheet.frames, "name", x);
+                    });
                     newlayer.t = getlayerduration(newlayer, newspritesheet);
-                    return newlayer;
-                });
-                newspritesheet.states = inputSpritesheet.states.map(function (s) {
+                    newspritesheet.layers.push(newlayer);
+                }
+                for (var name in s.states) {
+                    var st = s.states[name];
                     var newstate = new state();
-                    newstate.name = s.name
+                    newstate.name = name;
                     newstate.totalduration = 0;
-                    newstate.layers = s.layers.map(function (l) {
-                        var thislayer = findwhere(newspritesheet.layers, "name", l);
-                        newstate.totalduration = newspritesheet.layers[thislayer].t > newstate.totalduration ? newspritesheet.layers[thislayer].t : newstate.totalduration;
+                    newstate.layers = st.layers.map(function (x) {
+                        var thislayer = findwhere(newspritesheet.layers, "name", x);
                         return thislayer;
                     });
-                    switch (s.flip) {
+                    switch (st.flip) {
                         case "h":
                             newstate.flip = 1;
                             break;
@@ -578,10 +600,10 @@ var RenderingLibrary = (function () {
                             newstate.flip = 0;
                             break;
                     }
-                    return newstate;
-                });
-                spritesheets.push(newspritesheet);
-            });
+                    newspritesheet.states.push(newstate);
+                }
+                return newspritesheet;
+            }));
         },
         addObject: function (spritesheet, state, x, y, z, isstatic) {
             var object = { vars: {}, spritesheetName: spritesheet, stateName: state, x: x, y: y, t: 0, zindex: z || 0, isstatic: isstatic || false, hiddenLayers: {} };
@@ -631,11 +653,11 @@ var RenderingLibrary = (function () {
             }
         },
         setParameter: function (id, key, value) {
-            objects[id].vars[variable] = value;
+            objects[id].vars[key] = value;
         },
         setState: function (id, state) {
-            if (objects[id].stateName != s) {
-                objects[id].stateName = s;
+            if (objects[id].stateName != state) {
+                objects[id].stateName = state;
                 updateObjectState(objects[id]);
                 var temp = objects[id].t;
                 objects[id].t = 0;
@@ -664,7 +686,6 @@ var RenderingLibrary = (function () {
                         moveQuadtreeObject(index, NaN, NaN, x, y);
                     }
                     return index;
-                    break;
                 case "endObjectBatch":
                     updateScope(camera.x + buffer_w / 2, camera.y + buffer_h / 2);
                     zIndexNeedsSorting = true;
@@ -674,12 +695,6 @@ var RenderingLibrary = (function () {
                     break;
                 case "hideLayer":
                     objects[commandArgs.id].hiddenLayers[commandArgs.layer] = true;
-                    break;
-                case "setWorkingFolder":
-                    workingFolder = folder;
-                    break;
-                case "getWorkingFolder":
-                    return workingFolder;
                     break;
             }
             //This function sends a command to your library, you can use this an extension point to provide additional functionality
@@ -699,8 +714,8 @@ var RenderingLibrary = (function () {
         setBufferSize: function (w, h) {
             buffer_w = w;
             buffer_h = h;
-            buffercanvas.width = w / zoom;
-            buffercanvas.height = h / zoom;
+            buffercanvas.width = w;
+            buffercanvas.height = h;
             quadtreeWidth = buffercanvas.width / 2;
             quadtreeHeight = buffercanvas.height / 2;
         },
@@ -708,6 +723,9 @@ var RenderingLibrary = (function () {
             return context;
         },
         chainWith: function (renderingLibrary) {
+            if (debugMode) {
+                debugHandler("Spritesheet.js does not support chaining to another rendering library");
+            }
             //Chains to an instance of another rendering library, used in 'proxy' libraries (for recording, networking, perspective...)
         },
         getSpriteBox: function (spritesheet, animationstate) {
@@ -746,6 +764,12 @@ var RenderingLibrary = (function () {
         debug: function (handler) {
             debugMode = true;
             debugHandler = handler;
+        },
+        setWorkingFolder: function (folder) {
+            workingFolder = folder;
+        },
+        getWorkingFolder: function () {
+            return workingFolder;
         }
     };
 });
