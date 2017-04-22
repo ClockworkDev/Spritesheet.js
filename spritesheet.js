@@ -85,9 +85,9 @@ var Spritesheet = (function () {
         //First we clear the context
         context.clearRect(0, 0, buffercanvas.width, buffercanvas.height);
         //In case it was modified before, we reset the alpha
-        context.globalAlpha = 1;
         //For each object
         for (var i = 0; i < objectsorder.length; i++) {
+            context.globalAlpha = 1;
             //We get the object in that position acoording to the zindex
             var object = objects[objectsorder[i].v];
             //We get its spritesheet
@@ -742,8 +742,8 @@ var Spritesheet = (function () {
                 var t = 0;
                 for (var j in layer.frames) {
                     var frame = spritesheet.frames[layer.frames[j]];
-                    var startX = layer.x(t);
-                    var startY = layer.y(t);
+                    var startX = layer.x(t, {});
+                    var startY = layer.y(t, {});
                     if (startX < minX || minX == undefined) {
                         minX = startX;
                     }
