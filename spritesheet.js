@@ -535,6 +535,7 @@ var Spritesheet = (function () {
 
                 var newspritesheet = new spritesheet();
                 newspritesheet.name = s.name;
+                newspritesheet.positionBasedOptimizations = s.positionBasedOptimizations=="false"?false:true;
                 if (s.src != undefined) {
                     newspritesheet.img = new Image()
                     if (workingFolder) {
@@ -611,7 +612,7 @@ var Spritesheet = (function () {
             object.bounds = getObjectBounds(object);
             objects.push(object);
             var index = objects.length - 1;
-            if (object.isstatic) {
+            if (object.isstatic===true || object.spritesheet.positionBasedOptimizations===false) {
                 staticObjects.push(index);
             } else {
                 moveQuadtreeObject(index, NaN, NaN, x, y);
@@ -635,16 +636,18 @@ var Spritesheet = (function () {
             objects[id].pause = false;
         },
         setX: function (id, x) {
-            if (!objects[id].isstatic) {
-                moveQuadtreeObject(id, objects[id].x, objects[id].y, x, objects[id].y);
+            var object = objects[id];
+            if (!(object.isstatic === true || object.spritesheet.positionBasedOptimizations === false)) {
+                moveQuadtreeObject(id, object.x, object.y, x, object.y);
             }
-            objects[id].x = x;
+            object.x = x;
         },
         setY: function (id, y) {
-            if (!objects[id].isstatic) {
-                moveQuadtreeObject(id, objects[id].x, objects[id].y, objects[id].x, y);
+            var object = objects[id];
+            if (!(object.isstatic === true || object.spritesheet.positionBasedOptimizations === false)) {
+                moveQuadtreeObject(id, object.x, object.y, object.x, y);
             }
-            objects[id].y = y;
+            object.y = y;
         },
         setZ: function (id, z) {
             if (objects[id].zindex != z) {
@@ -680,7 +683,7 @@ var Spritesheet = (function () {
                     object.bounds = getObjectBounds(object);
                     objects.push(object);
                     var index = objects.length - 1;
-                    if (object.isstatic) {
+                    if (object.isstatic === true || object.spritesheet.positionBasedOptimizations === false) {
                         staticObjects.push(index);
                     } else {
                         moveQuadtreeObject(index, NaN, NaN, x, y);
