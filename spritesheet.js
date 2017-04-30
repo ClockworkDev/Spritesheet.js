@@ -1,4 +1,4 @@
-var Spritesheet = (function () {
+﻿var Spritesheet = (function () {
 
     //Here is where you should put all your rendering code, which will be private
     //This canvas will be used as a buffer to store the image off-screen
