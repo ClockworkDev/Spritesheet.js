@@ -13,10 +13,10 @@
 
     //Here the 'real' canvas and context will be stored
     var canvas, realcontext;
-    //Here we store the handler returned by the setInterval function
-    var intervalholder;
 
     var workingFolder = "";
+
+    var paused = false; //Whether the animation is paused
 
 
     //The camera allows to move the view without moving the individual sprites
@@ -498,15 +498,29 @@
             canvas = mycanvas;
             realcontext = canvas.getContext('2d');
             //We loop renderprocess and renderdraw
-            intervalholder = window.setInterval(renderprocess, Math.round(1000 / nfps));
-            requestAnimationFrame(function renderdrawrequest() { renderdraw(); requestAnimationFrame(renderdrawrequest) });
+            var msPerFrame = 1000 / nfps;
+            var lastTime = performance.now();
+            requestAnimationFrame(function renderdrawrequest(timestamp) {
+                var timeElapsed = timestamp - lastTime;
+                var dirtyFrame = false;
+                while (timeElapsed >= msPerFrame) {
+                    if (paused != true) {
+                        renderprocess();
+                    }
+                    dirtyFrame = true;
+                    timeElapsed -= msPerFrame;
+                }
+                renderdraw();
+                lastTime = timestamp-timeElapsed;
+                requestAnimationFrame(renderdrawrequest);
+            });
             fps = nfps;
         },
         pauseAll: function () {
-            window.clearInterval(intervalholder);
+            paused = true;
         },
         restart: function () {
-            intervalholder = window.setInterval(renderprocess, Math.round(1000 / nfps));
+            paused = false;
         },
         setCamera: function (x, y, z) {
             if (camera.x == x && camera.y == y) {
@@ -535,7 +549,7 @@
 
                 var newspritesheet = new spritesheet();
                 newspritesheet.name = s.name;
-                newspritesheet.positionBasedOptimizations = s.positionBasedOptimizations=="false"?false:true;
+                newspritesheet.positionBasedOptimizations = s.positionBasedOptimizations == "false" ? false : true;
                 if (s.src != undefined) {
                     newspritesheet.img = new Image()
                     if (workingFolder) {
@@ -612,7 +626,7 @@
             object.bounds = getObjectBounds(object);
             objects.push(object);
             var index = objects.length - 1;
-            if (object.isstatic===true || object.spritesheet.positionBasedOptimizations===false) {
+            if (object.isstatic === true || object.spritesheet.positionBasedOptimizations === false) {
                 staticObjects.push(index);
             } else {
                 moveQuadtreeObject(index, NaN, NaN, x, y);
