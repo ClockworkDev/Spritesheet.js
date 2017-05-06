@@ -596,6 +596,7 @@
                     newstate.totalduration = 0;
                     newstate.layers = st.layers.map(function (x) {
                         var thislayer = findwhere(newspritesheet.layers, "name", x);
+                        newstate.totalduration = newspritesheet.layers[thislayer].t > newstate.totalduration ? newspritesheet.layers[thislayer].t : newstate.totalduration;
                         return thislayer;
                     });
                     switch (st.flip) {
