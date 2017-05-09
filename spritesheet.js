@@ -38,7 +38,10 @@
     var rendermode = rendermode_default;
 
     var debugMode = false;
-    var debugHandler;
+    var debugMessagesCache = [];
+    var debugHandler = function (x) {
+        debugMessagesCache.push(x);
+    };
 
     //Holds the spritesheet: Player, enemy1...
     function spritesheet() {
@@ -596,7 +599,11 @@
                     newstate.totalduration = 0;
                     newstate.layers = st.layers.map(function (x) {
                         var thislayer = findwhere(newspritesheet.layers, "name", x);
-                        newstate.totalduration = newspritesheet.layers[thislayer].t > newstate.totalduration ? newspritesheet.layers[thislayer].t : newstate.totalduration;
+                        if (!newspritesheet.layers[thislayer]) {
+                            debugHandler("There is no layer " + x+" defined in spritesheet " + newspritesheet.name);
+                        } else {
+                            newstate.totalduration = newspritesheet.layers[thislayer].t > newstate.totalduration ? newspritesheet.layers[thislayer].t : newstate.totalduration;
+                        }
                         return thislayer;
                     });
                     switch (st.flip) {
@@ -782,6 +789,7 @@
         debug: function (handler) {
             debugMode = true;
             debugHandler = handler;
+            debugMessagesCache.forEach(debugHandler);
         },
         setWorkingFolder: function (folder) {
             workingFolder = folder;
