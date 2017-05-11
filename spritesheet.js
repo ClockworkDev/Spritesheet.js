@@ -113,21 +113,27 @@
                 //We set k to the first frame of the layer
                 //And we add the duration of the frames until we reach current t
                 var tempt = 0, k = 0;
+                var substractFlag = false;
                 while (tempt < superModulo(object.t, layer.t)) {
+                    substractFlag = true;
                     var thisframe = spritesheet.frames[layer.frames[k]];
                     //If the duration of a frame is set to 0 it stops there
                     if (thisframe.t == 0) {
+                        substractFlag = false;
                         break;
                     }
                     k++;
                     //If we have reached exactly the end of the animation we set the first frame
                     if (k == layer.frames.length) {
-                        k = 0;
                         break;
                     }
                     //We add the duration of this frame to the counter
                     tempt += thisframe.t;
                 }
+                if (spritesheet.name == "versusText") {
+                    console.log(superModulo(object.t, layer.t), k);
+                }
+                k = substractFlag ? k - 1 : k;
                 //We finally have the frame that must be drawn
                 var frame = spritesheet.frames[layer.frames[k]];
                 //If it is a full texture frame, set the appropiate x,y,w,h
