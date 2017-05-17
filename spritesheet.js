@@ -520,7 +520,7 @@
                     timeElapsed -= msPerFrame;
                 }
                 renderdraw();
-                lastTime = timestamp-timeElapsed;
+                lastTime = timestamp - timeElapsed;
                 requestAnimationFrame(renderdrawrequest);
             });
             fps = nfps;
@@ -572,6 +572,7 @@
                     var newframe = new frame();
                     newframe.name = name;
                     if (f.code) {
+                        newframe.t = f.t;
                         newframe.code = new Function("x", "y", "t", "context", "vars", f.code);
                     } else {
                         if (f.fullTexture) {
@@ -606,7 +607,7 @@
                     newstate.layers = st.layers.map(function (x) {
                         var thislayer = findwhere(newspritesheet.layers, "name", x);
                         if (!newspritesheet.layers[thislayer]) {
-                            debugHandler("There is no layer " + x+" defined in spritesheet " + newspritesheet.name);
+                            debugHandler("There is no layer " + x + " defined in spritesheet " + newspritesheet.name);
                         } else {
                             newstate.totalduration = newspritesheet.layers[thislayer].t > newstate.totalduration ? newspritesheet.layers[thislayer].t : newstate.totalduration;
                         }
