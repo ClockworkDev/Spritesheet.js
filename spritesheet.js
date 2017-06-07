@@ -130,9 +130,6 @@
                     //We add the duration of this frame to the counter
                     tempt += thisframe.t;
                 }
-                if (spritesheet.name == "versusText") {
-                    console.log(superModulo(object.t, layer.t), k);
-                }
                 k = substractFlag ? k - 1 : k;
                 //We finally have the frame that must be drawn
                 var frame = spritesheet.frames[layer.frames[k]];
